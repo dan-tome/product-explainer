@@ -1,0 +1,34 @@
+{
+  "maltodextrin": {
+    "status": "warning",
+    "info": "High glycemic index, can cause spikes in blood sugar."
+  },
+  "sugar": {
+    "status": "avoid",
+    "info": "High intake is linked to obesity, type 2 diabetes, and heart disease."
+  },
+  "water": {
+    "status": "safe",
+    "info": "Essential for life and generally safe."
+  },
+  "palm oil": {
+    "status": "warning",
+    "info": "High in saturated fats and environmental concerns regarding production."
+  },
+  "salt": {
+    "status": "warning",
+    "info": "Essential in small amounts, but high intake can lead to high blood pressure."
+  },
+  "aspartame": {
+    "status": "avoid",
+    "info": "Artificial sweetener with controversial health studies."
+  },
+  "citric acid": {
+    "status": "safe",
+    "info": "Naturally occurring acid used as a preservative and flavor enhancer."
+  },
+  "lecithin": {
+    "status": "safe",
+    "info": "A fat that is essential in the cells of the body."
+  }
+}
