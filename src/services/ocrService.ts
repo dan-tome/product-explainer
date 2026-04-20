@@ -1,8 +1,4 @@
-/**
- * OCR Service to handle text extraction from images.
- * In a real-world scenario, this would interface with Google Cloud Vision,
- * AWS Rekognition, or an on-device ML model.
- */
+import TextRecognition from '@react-native-ml-kit/text-recognition';
 
 export interface OCRResult {
   text: string;
@@ -10,17 +6,14 @@ export interface OCRResult {
 }
 
 export const extractTextFromImage = async (imageUri: string): Promise<OCRResult> => {
-  console.log('Extracting text from image:', imageUri);
-  
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  
-  // For demonstration purposes, we return a mock list of ingredients
-  // In a real app, this would be the actual text found in the image
-  const mockIngredients = "Water, Sugar, Maltodextrin, Palm Oil, Salt, Citric Acid, Soy Lecithin";
-  
-  return {
-    text: mockIngredients,
-    confidence: 0.95,
-  };
+  try {
+    const result = await TextRecognition.recognize(imageUri);
+    return {
+      text: result.text,
+      confidence: 1.0,
+    };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`OCR failed: ${message}`);
+  }
 };
