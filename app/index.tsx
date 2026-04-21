@@ -4,7 +4,7 @@ import { CameraView } from 'expo-camera';
 import { useRouter } from 'expo-router';
 import { Camera as CameraIcon, FlipHorizontal as FlipIcon } from 'lucide-react-native';
 import { useCameraPermissions } from '../src/hooks/useCameraPermissions';
-import * as ImageManipulator from 'expo-image-manipulator';
+import { preprocessImageForOCR } from '../src/services/imageProcessingService';
 import { extractTextFromImage } from '../src/services/ocrService';
 
 export default function CameraScreen() {
@@ -42,15 +42,11 @@ export default function CameraScreen() {
         });
 
         if (photo) {
-          // Pre-process image to optimize for OCR
-          const manipulatedImage = await ImageManipulator.manipulateAsync(
-            photo.uri,
-            [{ resize: { width: 1000 } }],
-            { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG }
-          );
-
-          // Perform OCR
-          const result = await extractTextFromImage(manipulatedImage.uri);
+          const processedUri = await preprocessImageForOCR(photo.uri, {
+            width: photo.width,
+            height: photo.height,
+          });
+          const result = await extractTextFromImage(processedUri);
           
           // Navigate to results
           router.push({
@@ -68,31 +64,44 @@ export default function CameraScreen() {
 
   return (
     <View style={styles.container}>
-      <CameraView style={styles.camera} facing={facing} ref={cameraRef}>
-        <View style={styles.overlay}>
-          <View style={styles.scanArea} />
-        </View>
-        
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.iconButton} onPress={toggleCameraFacing}>
-            <FlipIcon size={30} color="white" />
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={[styles.captureButton, isScanning && styles.disabledButton]} 
-            onPress={takePicture}
-            disabled={isScanning}
+      <CameraView style={styles.camera} facing={facing} ref={cameraRef} />
+      <View style={styles.overlay}>
+        <View style={styles.scanArea} />
+      </View>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.iconButton} onPress={toggleCameraFacing}>
+          <FlipIcon size={30} color="white" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.captureButton, isScanning && styles.disabledButton]}
+          onPress={takePicture}
+          disabled={isScanning}
+        >
+          {isScanning ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <CameraIcon size={40} color="white" />
+          )}
+        </TouchableOpacity>
+        {__DEV__ && (
+          <TouchableOpacity
+            style={styles.devButton}
+            onPress={async () => {
+              setIsScanning(true);
+              try {
+                const result = await extractTextFromImage('file:///data/data/com.dantome.productexplainer/cache/test-image.png');
+                router.push({ pathname: '/results', params: { text: result.text } });
+              } catch (e) {
+                console.error(e);
+              } finally {
+                setIsScanning(false);
+              }
+            }}
           >
-            {isScanning ? (
-              <ActivityIndicator color="white" />
-            ) : (
-              <CameraIcon size={40} color="white" />
-            )}
+            <Text style={styles.devButtonText}>DEV</Text>
           </TouchableOpacity>
-          
-          <View style={styles.spacer} />
-        </View>
-      </CameraView>
+        )}
+      </View>
     </View>
   );
 }
@@ -112,8 +121,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   overlay: {
-    flex: 1,
-    backgroundColor: 'transparent',
+    ...StyleSheet.absoluteFillObject,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -126,6 +134,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
   },
   buttonContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     flexDirection: 'row',
     backgroundColor: 'rgba(0,0,0,0.5)',
     paddingBottom: 40,
@@ -161,7 +173,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'white',
   },
-  spacer: {
-    width: 50,
-  }
+  devButton: {
+    backgroundColor: 'rgba(255,255,0,0.7)',
+    padding: 8,
+    borderRadius: 6,
+  },
+  devButtonText: {
+    color: '#000',
+    fontWeight: 'bold',
+    fontSize: 12,
+  },
 });
