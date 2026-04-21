@@ -18,7 +18,7 @@ export const analyzeWithGemini = async (ingredients: string[]): Promise<Ingredie
   if (ingredients.length === 0) return [];
 
   const genAI = new GoogleGenerativeAI(process.env.EXPO_PUBLIC_GEMINI_API_KEY || '');
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
   try {
     const result = await model.generateContent(PROMPT + ingredients.join('\n'));
