@@ -43,6 +43,11 @@ describe('IngredientCard — Level 1 (default)', () => {
     expect(screen.getByText('Vitamin C')).toBeTruthy();
   });
 
+  it('renders scientific_name on the face when showScientific is true', () => {
+    render(<IngredientCard ingredient={makeIngredient()} showScientific />);
+    expect(screen.getByText('Ascorbic Acid')).toBeTruthy();
+  });
+
   it('renders functional_purpose', () => {
     render(<IngredientCard ingredient={makeIngredient()} />);
     expect(screen.getByText(/Prevents spoilage/)).toBeTruthy();
@@ -79,7 +84,15 @@ describe('IngredientCard — Level 2 (first tap)', () => {
   it('reveals scientific_name after first tap', () => {
     render(<IngredientCard ingredient={makeIngredient()} />);
     fireEvent.press(screen.getByText('Vitamin C'));
+    expect(screen.getByText('Scientific Name')).toBeTruthy();
     expect(screen.getByText('Ascorbic Acid')).toBeTruthy();
+  });
+
+  it('when showScientific, reveals common name in L2 after first tap', () => {
+    render(<IngredientCard ingredient={makeIngredient()} showScientific />);
+    fireEvent.press(screen.getByText('Ascorbic Acid'));
+    expect(screen.getByText('Common name')).toBeTruthy();
+    expect(screen.getByText('Vitamin C')).toBeTruthy();
   });
 
   it('reveals exposure_context after first tap', () => {

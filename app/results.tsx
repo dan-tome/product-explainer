@@ -22,6 +22,7 @@ export default function ResultsScreen() {
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [productType, setProductType] = useState<ProductType>('UNKNOWN');
   const [loading, setLoading] = useState(true);
+  const [showScientific, setShowScientific] = useState(false);
 
   useEffect(() => {
     const raw = text || '';
@@ -72,6 +73,7 @@ export default function ResultsScreen() {
             <IngredientCard
               ingredient={item}
               compoundGroup={isCompoundGroupMember(item, bridge.synergyActive)}
+              showScientific={showScientific}
             />
           )}
           ListHeaderComponent={
@@ -79,6 +81,39 @@ export default function ResultsScreen() {
               <View>
                 <DailySnapshot ingredients={ingredients} />
                 <ProductPulse ingredients={ingredients} productType={productType} />
+                <View style={styles.ingredientsToggleRow}>
+                  <Text style={styles.ingredientsSectionLabel}>INGREDIENTS</Text>
+                  <View style={styles.ingredientsToggleOptions}>
+                    <TouchableOpacity
+                      onPress={() => setShowScientific(false)}
+                      accessibilityRole="button"
+                      accessibilityState={{ selected: !showScientific }}
+                    >
+                      <Text
+                        style={[
+                          styles.ingredientsToggleOption,
+                          showScientific ? styles.ingredientsToggleInactive : styles.ingredientsToggleActive,
+                        ]}
+                      >
+                        Common
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => setShowScientific(true)}
+                      accessibilityRole="button"
+                      accessibilityState={{ selected: showScientific }}
+                    >
+                      <Text
+                        style={[
+                          styles.ingredientsToggleOption,
+                          showScientific ? styles.ingredientsToggleActive : styles.ingredientsToggleInactive,
+                        ]}
+                      >
+                        INCI
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
               </View>
             ) : null
           }
@@ -118,6 +153,38 @@ const styles = StyleSheet.create({
   listContent: {
     paddingTop: 8,
     paddingBottom: 32,
+  },
+  ingredientsToggleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 4,
+  },
+  ingredientsSectionLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 0.9,
+    textTransform: 'uppercase',
+    color: '#78909C',
+  },
+  ingredientsToggleOptions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  ingredientsToggleOption: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  ingredientsToggleActive: {
+    color: RESEARCH_PALETTE.primary,
+    opacity: 1,
+  },
+  ingredientsToggleInactive: {
+    color: '#B0BEC5',
+    opacity: 0.7,
   },
   emptyContainer: {
     paddingVertical: 32,

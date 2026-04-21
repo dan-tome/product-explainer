@@ -178,14 +178,13 @@ Utility modules (non-rendering, live in `src/components/`):
 - Thyroid + estrogen pathway synergy detection
 - Three-tier expandable ingredient cards
 - DailySnapshot weather-tone risk summary
-- Routine/session scan history (in-memory)
+- Routine/session scan history (in-memory + AsyncStorage persistence via `loadRoutine()`)
+- Translation toggle (Common / INCI name switch) on results screen and IngredientCard
 
 ### Planned / Not Yet Implemented
-- **Translation Toggle:** UI switch between Scientific (INCI) name and Common name on IngredientCard.
 - **User allergen profile:** Custom allergen list persisted to device storage.
 - **EDC data completeness:** Full toxicology list pending; current set is parabens + UV filters only.
 - **Barcode → product lookup:** GTIN ghost labels are display-only; no product database call yet.
-- **Persistent scan history:** `routineService` is in-memory only; no AsyncStorage or SQLite backing.
 
 ---
 

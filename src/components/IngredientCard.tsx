@@ -15,6 +15,8 @@ interface Props {
   ingredient: Ingredient;
   /** Synergy pathway — teal/purple hairline (Tier 2 aggregate) */
   compoundGroup?: boolean;
+  /** When true, collapsed face shows INCI/scientific name; L1 shows common name. Default: common on face, scientific in L1. */
+  showScientific?: boolean;
 }
 
 type Level = 0 | 1 | 2;
@@ -29,7 +31,11 @@ const STATUS_LABEL: Record<IngredientStatus, string> = {
 const L2_HEIGHT = 100;
 const L3_HEIGHT = 140; // extra height for literacy_flag row
 
-export const IngredientCard: React.FC<Props> = ({ ingredient, compoundGroup = false }) => {
+export const IngredientCard: React.FC<Props> = ({
+  ingredient,
+  compoundGroup = false,
+  showScientific = false,
+}) => {
   const [level, setLevel] = useState<Level>(0);
   const animL2 = useRef(new Animated.Value(0)).current;
   const animL3 = useRef(new Animated.Value(0)).current;
@@ -59,7 +65,7 @@ export const IngredientCard: React.FC<Props> = ({ ingredient, compoundGroup = fa
     ]);
     entrance.start();
     return () => entrance.stop();
-  }, [ingredient.common_name, ingredient.functional_purpose]);
+  }, [ingredient.common_name, ingredient.functional_purpose, ingredient.scientific_name, showScientific]);
 
   const advance = () => {
     if (level === 0) {
@@ -131,7 +137,7 @@ export const IngredientCard: React.FC<Props> = ({ ingredient, compoundGroup = fa
         <View style={styles.header}>
           <View style={styles.nameRow}>
             <Text style={styles.commonName} numberOfLines={1}>
-              {capitalize(ingredient.common_name)}
+              {showScientific ? ingredient.scientific_name : capitalize(ingredient.common_name)}
             </Text>
             {ingredient.is_ai_generated && (
               <Sparkles size={12} color={RESEARCH_PALETTE.secondary} style={styles.icon} />
@@ -169,8 +175,12 @@ export const IngredientCard: React.FC<Props> = ({ ingredient, compoundGroup = fa
         {/* Ventilation icon lives inline next to “Exposure Context” (Wind replacement); rail stays spacer. */}
         <TransparencySandwich showVentilation={false}>
           <View>
-            <Text style={[styles.sectionLabel, styles.sandwichFirstLabel]}>Scientific Name</Text>
-            <Text style={styles.sectionValue}>{ingredient.scientific_name}</Text>
+            <Text style={[styles.sectionLabel, styles.sandwichFirstLabel]}>
+              {showScientific ? 'Common name' : 'Scientific Name'}
+            </Text>
+            <Text style={styles.sectionValue}>
+              {showScientific ? ingredient.common_name : ingredient.scientific_name}
+            </Text>
             <View style={styles.exposureLabelRow}>
               {showVentilation && (
                 <View style={styles.ventIconWrap}>
