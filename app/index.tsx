@@ -43,23 +43,25 @@ export default function CameraScreen() {
 
         if (photo) {
           // Pre-process image to optimize for OCR
+          // Currently resizes to 1000px width and compresses
           const manipulatedImage = await ImageManipulator.manipulateAsync(
             photo.uri,
             [{ resize: { width: 1000 } }],
             { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG }
           );
 
-          // Perform OCR
+          // Perform OCR (Currently MOCKED)
           const result = await extractTextFromImage(manipulatedImage.uri);
           
-          // Navigate to results
+          // Navigate to results with the extracted text
           router.push({
             pathname: '/results',
             params: { text: result.text }
           });
         }
       } catch (error) {
-        console.error('Error taking picture:', error);
+        console.error('Error during capture/OCR flow:', error);
+        // TODO: Implement better user feedback for failures
       } finally {
         setIsScanning(false);
       }

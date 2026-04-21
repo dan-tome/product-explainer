@@ -10,6 +10,15 @@ export interface IngredientAnalysis {
 
 const typedIngredientsData = ingredientsData as Record<string, { status: string; info: string }>;
 
+/**
+ * Analysis Service to process ingredient text and provide insights.
+ * 
+ * TODO: Replace this basic JSON lookup with a more advanced AI-driven analysis.
+ * - Integration with LLMs (e.g., GPT-4) would provide much richer context.
+ * - AI could handle spelling errors, varied names, and complex nutritional context.
+ * 
+ * Current status: BASIC LOCAL LOOKUP
+ */
 export const analyzeIngredients = (text: string): IngredientAnalysis[] => {
   if (!text) return [];
 
@@ -17,6 +26,7 @@ export const analyzeIngredients = (text: string): IngredientAnalysis[] => {
   const rawIngredients = text.split(/[,.\n]/).map(i => i.trim().toLowerCase()).filter(i => i.length > 0);
   
   return rawIngredients.map(name => {
+    // Simple substring matching in our local database
     const matched = Object.keys(typedIngredientsData).find(key => 
       name.includes(key) || key.includes(name)
     );
@@ -30,6 +40,7 @@ export const analyzeIngredients = (text: string): IngredientAnalysis[] => {
       };
     }
 
+    // Default for unknown ingredients
     return {
       name: name,
       status: 'unknown',

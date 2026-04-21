@@ -1,7 +1,13 @@
 /**
  * OCR Service to handle text extraction from images.
- * In a real-world scenario, this would interface with Google Cloud Vision,
- * AWS Rekognition, or an on-device ML model.
+ * 
+ * TODO: In a real-world scenario, this would interface with:
+ * - Google Cloud Vision API
+ * - AWS Rekognition
+ * - On-device ML model (e.g., Apple's Vision framework or Google ML Kit)
+ * 
+ * Current status: MOCKED
+ * The service currently returns a hardcoded list of ingredients for demonstration.
  */
 
 export interface OCRResult {
@@ -15,8 +21,8 @@ export const extractTextFromImage = async (imageUri: string): Promise<OCRResult>
   // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 1500));
   
-  // For demonstration purposes, we return a mock list of ingredients
-  // In a real app, this would be the actual text found in the image
+  // MOCK IMPLEMENTATION
+  // In a real implementation, we would send the imageUri to an OCR provider.
   const mockIngredients = "Water, Sugar, Maltodextrin, Palm Oil, Salt, Citric Acid, Soy Lecithin";
   
   return {

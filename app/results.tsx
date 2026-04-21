@@ -7,6 +7,9 @@ import { IngredientCard } from '../src/components/IngredientCard';
 export default function ResultsScreen() {
   const { text } = useLocalSearchParams<{ text: string }>();
   
+  // NOTE: In the current prototype, analyzeIngredients is synchronous
+  // as it performs a simple local lookup. In a future AI-enabled version,
+  // this should be handled asynchronously (e.g., within a useEffect).
   const analyzedIngredients = useMemo(() => {
     return analyzeIngredients(text || '');
   }, [text]);
