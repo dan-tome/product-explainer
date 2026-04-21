@@ -74,7 +74,9 @@ describe('ResultsScreen', () => {
 
   it('renders without crashing after loading', async () => {
     render(<ResultsScreen />);
-    await waitFor(() => expect(screen.queryByTestId('loading-indicator')).toBeNull());
+    // Positive presence check is more reliable than absence check in React 19 concurrent mode
+    await waitFor(() => expect(screen.getByText('7 ingredients')).toBeTruthy());
+    expect(screen.queryByTestId('loading-indicator')).toBeNull();
   });
 
   it('shows ingredient count in ProductPulse after loading', async () => {

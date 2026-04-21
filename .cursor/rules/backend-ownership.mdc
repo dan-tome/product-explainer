@@ -34,14 +34,14 @@ If you hit a **real** services gap—**missing field** on a type, **insufficient
 - **`ui-ux-priority.mdc`** still biases work toward screens/components/styles when tasks are vague.
 - This rule adds: **even when touching `app/` or components, leave services and pipeline intact** unless the task explicitly includes them.
 
-## Dependency hygiene (active work — 2026-04-21)
+## Dependency hygiene (complete — 2026-04-22)
 
-Dependencies are being cleaned in stages. **Do not add new packages without checking the stage log below.**
+All four stages are done. Toolchain is on a solid footing.
 
 - **Stage 1 — DONE:** `expo-blur` removed (was declared, never installed, never imported).
 - **Stage 2 — DONE:** `react-native-svg` confirmed at SDK 54 ceiling (15.12.1); `react-test-renderer` pinned exactly to `19.1.0` to match `react` (removed loose `^` range).
-- **Stage 3 — DONE:** Expo SDK 55 upgrade complete. React 19.2.0, RN 0.83.6, all `expo-*` on SDK 55 versions. `react-test-renderer` pinned exactly to match `react` (never use `^` range for this package).
-- **Stage 4 — PLANNED:** jest 29 → 30 (major version, dedicated pass). TypeScript 5.9 → 6.0 (major version, dedicated pass).
+- **Stage 3 — DONE:** Expo SDK 55 upgrade complete. React 19.2.5, RN 0.83.6, all `expo-*` on SDK 55 versions. `react-test-renderer` pinned exactly to match `react` (never use `^` range for this package).
+- **Stage 4 — DONE:** jest 30.3.0 — `jest-watch-typeahead` peer conflict resolved via npm `overrides`; expo winter runtime lazy-getter crash resolved by locking Node.js globals as non-configurable in `jest.setup.js` before expo loads. TypeScript 6.0.3 — clean upgrade, zero breaking changes in our code. All 192 tests pass.
 
 Rule: always use `npx expo install <pkg>` for runtime deps so Expo enforces SDK-compatible versions. Raw `npm install` only for dev tooling (types, jest plugins).
 

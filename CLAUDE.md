@@ -233,16 +233,16 @@ npm run build:android
 
 All dependency changes go through `npx expo install` (not raw `npm install`) so Expo can enforce SDK-compatible versions. Direct `npm install` is only used for pure dev tooling (jest plugins, types) that Expo doesn't manage.
 
-**Current dependency status** (last audited 2026-04-21):
+**Current dependency status** (last audited 2026-04-22):
 
-| Status | Action |
+| Package | Status |
 |---|---|
 | `expo-blur` | Removed — was declared but never imported or installed |
-| Expo SDK 54 → 55 | **Done** — all `expo-*` packages updated via `npx expo install --fix`; React 19.2.0, RN 0.83.6 |
-| `react-native-svg` | Updated to 15.15.3 (SDK 55 compatible) |
-| `react-test-renderer` | Pinned exactly at `19.2.0` — must always match `react` version exactly (no `^` range) |
-| jest 29 → 30 | Hold — major version, dedicated pass required |
-| TypeScript 5.9 → 6.0 | Hold — major version, dedicated pass required |
+| Expo SDK 54 → 55 | **Done** — all `expo-*` packages updated via `npx expo install --fix`; React 19.2.5, RN 0.83.6 |
+| `react-native-svg` | **Done** — 15.15.3 (SDK 55 compatible) |
+| `react-test-renderer` | **Done** — pinned exactly at `19.2.5` — must always match `react` version exactly (no `^` range) |
+| jest 29 → 30 | **Done** — `jest-watch-typeahead` peer conflict resolved via `overrides`; expo winter runtime lazy-getter conflict resolved by locking Node.js globals in `jest.setup.js` as non-configurable before expo loads |
+| TypeScript 5.9 → 6.0 | **Done** — upgraded to `^6.0.3`; all 192 tests pass with zero type errors |
 
 **Never upgrade `react-native` independently** — it must move with the Expo SDK.
 
