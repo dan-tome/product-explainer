@@ -1,0 +1,23 @@
+---
+description: Follow CLAUDE.md — HealthScan / Product Explainer canonical project guide
+alwaysApply: true
+---
+
+# CLAUDE.md is the source of truth
+
+For **every** task in this repo, **read and align with `CLAUDE.md`** at the project root before making substantive changes.
+
+**Resolving “conflicts”:** `CLAUDE.md` wins on **product facts and constraints** (vision, stack, Theme/motion rules, types, pipeline accuracy when you touch those files). For **what to build first** when the task is vague, **UI/UX scope wins** per `.cursor/rules/ui-ux-priority.mdc` (prefer screens/components/styles over new backend). User instructions override both.
+
+## What to enforce from it
+
+- **Vision:** Chemical literacy; map jargon to plain English; verticals F&B, cosmetics, household.
+- **Stack:** React Native + Expo SDK 54; `expo-camera`, ML Kit OCR, `expo-image-manipulator`, Gemini via `@google/generative-ai`, Expo Router. Services → `src/services/`, UI → `src/components/`, screens → `app/`, types → `src/types/`, static data → `src/data/`.
+- **TypeScript:** Strict; functional components + hooks.
+- **UI:** Use **Research Palette** in `src/styles/Theme.ts` — **no red/green traffic lights**. Status → `safe | warning | avoid | unknown` via `STATUS_COLOR`, not raw red/green.
+- **Motion:** Use `src/styles/motion.ts` — do not hardcode animation timings/easing inline.
+- **Data:** Canonical `Ingredient` and related types live in `src/types/product.ts`; viewfinder states in `src/types/viewfinder.ts`.
+- **Pipeline & services:** Respect the camera → barcode / OCR → preprocess → ML Kit → bridge → classify → Gemini → allergen flow described in `CLAUDE.md` when touching those paths.
+- **Env:** `EXPO_PUBLIC_GEMINI_API_KEY` in `.env.local` for Gemini.
+
+When unsure about architecture, naming, or what’s implemented vs planned, **open `CLAUDE.md` and follow it**.
