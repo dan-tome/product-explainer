@@ -48,14 +48,15 @@ export default function CameraScreen() {
           });
           const result = await extractTextFromImage(processedUri);
           
-          // Navigate to results
+          // Navigate to results with the extracted text
           router.push({
             pathname: '/results',
             params: { text: result.text }
           });
         }
       } catch (error) {
-        console.error('Error taking picture:', error);
+        console.error('Error during capture/OCR flow:', error);
+        // TODO: Implement better user feedback for failures
       } finally {
         setIsScanning(false);
       }
