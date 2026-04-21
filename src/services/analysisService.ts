@@ -1,4 +1,4 @@
-import ingredientsData from '../data/ingredients.json';
+import { analyzeWithGemini } from './geminiService';
 
 export type IngredientStatus = 'safe' | 'warning' | 'avoid' | 'unknown';
 
@@ -7,8 +7,6 @@ export interface IngredientAnalysis {
   status: IngredientStatus;
   info: string;
 }
-
-const typedIngredientsData = ingredientsData as Record<string, { status: string; info: string }>;
 
 const extractIngredientsSection = (text: string): string => {
   const match = text.match(/ingredients[:\s]+(.+?)(?:\n{2,}|allergen|contains:|nutrition|$)/is);
@@ -30,33 +28,16 @@ const normalizeText = (text: string): string =>
     .replace(/[|\n\r]+/g, ',')
     .replace(/,{2,}/g, ',');
 
-export const analyzeIngredients = (text: string): IngredientAnalysis[] => {
+export const analyzeIngredients = async (text: string): Promise<IngredientAnalysis[]> => {
   if (!text) return [];
 
   const section = extractIngredientsSection(text);
-  const rawIngredients = normalizeText(section)
+  const ingredients = normalizeText(section)
     .split(',')
     .map(i => i.trim().replace(/\s+/g, ' ').toLowerCase())
     .filter(i => i.length > 3 && /^[a-zA-Z]{2}/i.test(i));
 
-  return rawIngredients.map(name => {
-    const matched = Object.keys(typedIngredientsData).find(key =>
-      name.includes(key) || key.includes(name)
-    );
+  if (ingredients.length === 0) return [];
 
-    if (matched) {
-      const data = typedIngredientsData[matched];
-      return {
-        name,
-        status: data.status as IngredientStatus,
-        info: data.info,
-      };
-    }
-
-    return {
-      name,
-      status: 'unknown',
-      info: 'No information available for this ingredient.',
-    };
-  });
+  return analyzeWithGemini(ingredients);
 };
