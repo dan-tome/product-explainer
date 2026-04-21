@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { CameraView } from 'expo-camera';
 import { useRouter } from 'expo-router';
 import { Camera as CameraIcon, FlipHorizontal as FlipIcon } from 'lucide-react-native';
@@ -14,8 +14,8 @@ export default function CameraScreen() {
   const cameraRef = useRef<CameraView>(null);
   const router = useRouter();
 
-  if (isGranted === null) {
-    return <View style={styles.container}><ActivityIndicator size="large" /></View>;
+  if (isGranted === undefined) {
+    return <View style={styles.container}><ActivityIndicator size="large" color="white" /></View>;
   }
 
   if (isGranted === false) {
@@ -60,6 +60,7 @@ export default function CameraScreen() {
         }
       } catch (error) {
         console.error('Error taking picture:', error);
+        Alert.alert('Error', 'Failed to scan image. Please try again.');
       } finally {
         setIsScanning(false);
       }

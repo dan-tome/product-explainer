@@ -1,14 +1,28 @@
-import React, { useMemo } from 'react';
-import { StyleSheet, View, Text, FlatList, SafeAreaView } from 'react-native';
+import React, { useMemo, useEffect, useState } from 'react';
+import { StyleSheet, View, Text, FlatList, SafeAreaView, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams, Stack } from 'expo-router';
-import { analyzeIngredients } from '../src/services/analysisService';
+import { analyzeIngredients, IngredientAnalysis } from '../src/services/analysisService';
 import { IngredientCard } from '../src/components/IngredientCard';
 
 export default function ResultsScreen() {
   const { text } = useLocalSearchParams<{ text: string }>();
+  const [analyzedIngredients, setAnalyzedIngredients] = useState<IngredientAnalysis[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   
-  const analyzedIngredients = useMemo(() => {
-    return analyzeIngredients(text || '');
+  useEffect(() => {
+    const performAnalysis = async () => {
+      setIsLoading(true);
+      try {
+        const results = await analyzeIngredients(text || '');
+        setAnalyzedIngredients(results);
+      } catch (error) {
+        console.error('Analysis failed:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    performAnalysis();
   }, [text]);
 
   const stats = useMemo(() => {
@@ -20,6 +34,15 @@ export default function ResultsScreen() {
       unknown: analyzedIngredients.filter(i => i.status === 'unknown').length,
     };
   }, [analyzedIngredients]);
+
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#f4511e" />
+        <Text style={styles.loadingText}>Analyzing ingredients...</Text>
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -63,6 +86,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#666',
   },
   summaryContainer: {
     flexDirection: 'row',
