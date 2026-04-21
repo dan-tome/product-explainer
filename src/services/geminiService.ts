@@ -1,17 +1,18 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { IngredientAnalysis } from './analysisService';
 
-const PROMPT = `You are a food ingredient analyst. You will be given a list of ingredients parsed from a food label via OCR — they may contain OCR errors or misspellings.
+const PROMPT = `You are a food ingredient analyst. You will be given a list of tokens parsed from a food label via OCR — they may contain OCR errors or misspellings.
 
-For each ingredient:
-1. Correct any obvious OCR errors or misspellings
-2. Classify it as: safe, warning, avoid, or unknown
-3. Provide a 1-2 sentence explanation
+For each token:
+1. If it is clearly not a food ingredient (garbled text, brand names, marketing copy, partial words), omit it from the response entirely.
+2. Otherwise, correct any OCR errors or misspellings in the name.
+3. Classify it as: safe, warning, avoid, or unknown.
+4. Provide a 1-2 sentence explanation.
 
 Respond with a JSON array only, no markdown:
 [{"name": "corrected name", "status": "safe|warning|avoid|unknown", "info": "explanation"}, ...]
 
-Ingredients:
+Tokens:
 `;
 
 export const analyzeWithGemini = async (ingredients: string[]): Promise<IngredientAnalysis[]> => {
