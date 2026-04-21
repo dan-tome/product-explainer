@@ -1,12 +1,17 @@
+jest.mock('@react-native-async-storage/async-storage', () =>
+  require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
+);
+
 jest.mock('./edcService', () => ({
   checkEDC: jest.fn(() => null),
   isRespiratoryHazard: jest.fn(() => false),
 }));
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { checkEDC } from './edcService';
 import {
   addScan, removeScan, getCompoundExposures,
-  getScannedProducts, getRoutineSummary, clearRoutine,
+  getScannedProducts, getRoutineSummary, clearRoutine, loadRoutine,
 } from './routineService';
 import { Ingredient } from '../types/product';
 
@@ -57,8 +62,9 @@ const SUNSCREEN_INGREDIENTS = [
 
 // ── Test lifecycle ────────────────────────────────────────────────────────────
 
-beforeEach(() => {
-  clearRoutine();
+beforeEach(async () => {
+  clearRoutine(); // also resets _hydrated flag
+  await AsyncStorage.clear();
   mockCheckEDC.mockReturnValue(null); // default: no EDC match
 });
 
@@ -236,6 +242,27 @@ describe('clearRoutine', () => {
     clearRoutine();
     expect(getScannedProducts()).toHaveLength(0);
     expect(getCompoundExposures()).toHaveLength(0);
+  });
+});
+
+// ── loadRoutine ───────────────────────────────────────────────────────────────
+
+describe('loadRoutine', () => {
+  it('returns without error when storage is empty', async () => {
+    await expect(loadRoutine()).resolves.toBeUndefined();
+    expect(getScannedProducts()).toHaveLength(0);
+  });
+
+  it('hydrates products from storage written by a previous session', async () => {
+    // Seed AsyncStorage directly (simulating data persisted by a prior app session)
+    const stored: [string, ScannedProduct][] = [
+      ['p1', { id: 'p1', label: 'Cleanser', ingredients: CLEANSER_INGREDIENTS, scannedAt: Date.now() }],
+    ];
+    await AsyncStorage.setItem('@healthscan/routine-v1', JSON.stringify(stored));
+
+    await loadRoutine();
+    expect(getScannedProducts()).toHaveLength(1);
+    expect(getScannedProducts()[0].label).toBe('Cleanser');
   });
 });
 
