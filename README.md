@@ -1,85 +1,94 @@
-# Product Explainer
+# HealthScan
 
-Product Explainer is a mobile application prototype built with Expo and React Native. It allows users to scan food product ingredient lists using their camera and receive instant feedback on the health safety of those ingredients.
+Turn any product label into plain English. HealthScan scans ingredient lists with your phone camera and explains what each ingredient is, what it does, and what the research says — without jargon.
 
-## 🚀 Current Implementation
+## What it does
 
-The current version of the app is a **functional prototype** with the following architecture:
+1. Point the camera at an ingredient list
+2. The app reads the label using on-device OCR (Google ML Kit)
+3. Gemini 2.5 Flash analyses every ingredient and returns plain-English explanations
+4. A results screen shows safety status, allergen flags, EDC concerns, and expandable science notes for each ingredient
 
-### System Architecture Overview
-The app follows a linear data flow:
-1.  **Capture**: User captures an image of an ingredient list using the camera.
-2.  **Pre-process**: The image is resized and compressed to optimize for future OCR processing.
-3.  **OCR (Mocked)**: Text is "extracted" from the image (currently returns a hardcoded list of ingredients).
-4.  **Analysis (Local Lookup)**: The extracted text is parsed and matched against a local JSON database of common ingredients.
-5.  **Display**: Results are categorized (Safe, Warning, Avoid) and displayed in a list with detailed information.
+## Tech stack
 
-### Tech Stack
-- **Framework**: Expo (SDK 54) / React Native
-- **Navigation**: Expo Router (File-based)
-- **Icons**: Lucide React Native
-- **State Management**: React Hooks (useState, useMemo, useRef)
-- **Image Processing**: `expo-image-manipulator`
+| Layer | Technology |
+|---|---|
+| Framework | React Native 0.83.6 + Expo SDK 55 (bare workflow) |
+| Navigation | Expo Router (file-based, `app/` directory) |
+| Camera & OCR | `expo-camera` + `@react-native-ml-kit/text-recognition` (on-device) |
+| AI analysis | Gemini 2.5 Flash via `@google/generative-ai` |
+| Image processing | `expo-image-manipulator` (crop + upscale before OCR) |
+| Language | TypeScript (strict) |
+| Testing | Jest 30 + jest-expo + React Testing Library |
 
-## 🛠️ Components & Services
+## Running locally
 
--   `app/index.tsx`: The primary camera interface using `expo-camera`.
--   `app/results.tsx`: The results dashboard showing the ingredient breakdown.
--   `src/services/ocrService.ts`: Placeholder for Optical Character Recognition logic.
--   `src/services/analysisService.ts`: Core logic for parsing ingredient strings and matching them against safety data.
--   `src/data/ingredients.json`: Seed database for ingredient safety information.
-
-## ⚠️ Gaps & Areas for Real Implementation
-
-This prototype identifies several key areas that require real-world implementation before production:
-
-### 1. Real OCR Integration
-*   **Current State**: Returns a hardcoded string: *"Water, Sugar, Maltodextrin, Palm Oil, Salt, Citric Acid, Soy Lecithin"*.
-*   **Need**: Integration with a real OCR engine like **Google Cloud Vision**, **AWS Rekognition**, or on-device models like **ML Kit**.
-*   **Challenges**: Handling curved surfaces, small fonts, and low-light conditions.
-
-### 2. AI-Driven Ingredient Analysis
-*   **Current State**: Simple substring matching against a small JSON file (`ingredients.json`).
-*   **Issues**:
-    *   **Case Sensitivity**: Currently relies on exact or substring matching which can be fragile.
-    *   **Limited Database**: Only handles a few dozen ingredients.
-    *   **Lack of Context**: Cannot distinguish between safe and unsafe uses of the same ingredient.
-*   **Need**: Integration with a Large Language Model (LLM) such as **OpenAI GPT-4o** or **Google Gemini**.
-*   **Benefits**:
-    *   Better handling of spelling variations and synonyms.
-    *   Identification of complex additives not in a static database.
-    *   Context-aware safety advice (e.g., cross-referencing with user allergies).
-
-### 3. Environment Variable Security
-*   **Need**: Once APIs (OCR/LLM) are integrated, the app will need a secure way to manage API keys using `expo-constants` or `.env` files (properly ignored in Git).
-
-### 4. Offline Functionality
-*   **Need**: The current mock works offline, but real OCR/AI typically requires an internet connection. Production should explore on-device OCR (Tesseract/MLKit) for better offline reliability.
-
-### 5. Error Handling & Edge Cases
-*   **Need**: More robust handling for:
-    *   Images containing no text.
-    *   Network timeouts during API calls.
-    *   User denying camera permissions.
-
-## 📖 Development Guide
-
-### Prerequisites
-- Node.js
-- Expo Go (on mobile) or Android/iOS Emulator
-
-### Setup
-1.  Install dependencies:
-    ```bash
-    npm install
-    ```
-2.  Start the app:
-    ```bash
-    npm start
-    ```
-
-### Building
-For generating a test APK:
 ```bash
-eas build --platform android --profile preview
+# Install dependencies
+npm install
+
+# Start Metro (Expo Go)
+npx expo start
+
+# Android emulator (requires Node 22 and Android Studio)
+eval "$(fnm env)" && fnm use 22 && \
+  JAVA_HOME="C:/Program Files/Android/Android Studio/jbr" \
+  npx expo run:android
+
+# Tests
+npm test
 ```
+
+> **Node version:** the project requires Node 22. If you use fnm, run `fnm use 22` before any Expo CLI command.
+
+## Environment
+
+Create `.env.local` in the project root:
+
+```
+EXPO_PUBLIC_GEMINI_API_KEY=your_key_here
+```
+
+## Architecture
+
+```
+Camera (expo-camera)
+  ├── Barcode path  →  real-time scan → ghost pill label
+  └── OCR path
+        ↓
+      Image capture + preprocessing (crop 80×40%, upscale to 1500px)
+        ↓
+      On-device OCR (ML Kit)
+        ↓
+      INCI synonym normalisation (French/Latin → English)
+        ↓
+      Product type classification  (FOOD / COSMETIC / HOUSEHOLD / UNKNOWN)
+        ↓
+      Gemini 2.5 Flash  →  Ingredient[] (11 fields per ingredient)
+        ↓
+      Allergen detection  (Milk, Egg, Wheat alias matching)
+        ↓
+      Results screen
+            ├── DailySnapshot  (weather-tone risk summary)
+            ├── ProductPulse   (allergen count, product type, primary ingredient)
+            └── IngredientCard × N  (three-tier expandable disclosure)
+```
+
+## Project structure
+
+```
+app/                  Expo Router screens
+  index.tsx           Camera + viewfinder
+  results.tsx         Ingredient results screen
+
+src/
+  services/           Business logic and API wrappers
+  components/         UI components
+  data/               Static reference data (EDC list, GTIN micro-labels)
+  types/              TypeScript interfaces
+  styles/             Theme, palette, motion constants
+
+CLAUDE.md             Full developer guide (pipeline, schema, conventions)
+```
+
+See `CLAUDE.md` for the complete developer reference including the data schema, services API, component inventory, and dependency hygiene notes.

@@ -1,5 +1,8 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ingredient } from '../types/product';
 import { checkEDC } from './edcService';
+
+const STORAGE_KEY = '@healthscan/routine-v1';
 
 export interface ScannedProduct {
   id: string;
@@ -35,6 +38,16 @@ const _products = new Map<string, ScannedProduct>();
 // Built incrementally at addScan time → getCompoundExposures() is O(k),
 // where k = unique flagged ingredient keys (EDC + allergen), not O(p × n).
 const _index = new Map<string, IndexEntry>();
+
+// ── Persistence ───────────────────────────────────────────────────────────────
+
+// Serialises _products to AsyncStorage. Fire-and-forget — never blocks callers.
+const persist = (): void => {
+  AsyncStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify(Array.from(_products.entries())),
+  ).catch(() => {}); // non-fatal: in-memory state remains the source of truth
+};
 
 // ── Private helpers ───────────────────────────────────────────────────────────
 
@@ -115,6 +128,7 @@ export const addScan = (id: string, label: string, ingredients: Ingredient[]): v
   const product: ScannedProduct = { id, label, ingredients, scannedAt: Date.now() };
   _products.set(id, product);
   indexIngredients(product);
+  persist();
 };
 
 /**
@@ -125,6 +139,7 @@ export const removeScan = (id: string): void => {
   if (!_products.has(id)) return;
   _products.delete(id);
   deindexProduct(id);
+  persist();
 };
 
 /**
@@ -171,4 +186,28 @@ export const getRoutineSummary = () => ({
 export const clearRoutine = (): void => {
   _products.clear();
   _index.clear();
+  _hydrated = false; // allow loadRoutine to re-run after a clear (storage is also being wiped)
+  persist();
+};
+
+/**
+ * Hydrates the in-memory routine from AsyncStorage.
+ * Call once on app mount (e.g. from the root layout's useEffect).
+ * Safe to call multiple times — subsequent calls are no-ops if already loaded.
+ */
+let _hydrated = false;
+export const loadRoutine = async (): Promise<void> => {
+  if (_hydrated) return;
+  _hydrated = true;
+  try {
+    const raw = await AsyncStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const entries: [string, ScannedProduct][] = JSON.parse(raw);
+    for (const [id, product] of entries) {
+      _products.set(id, product);
+      indexIngredients(product);
+    }
+  } catch {
+    // Storage read failure is non-fatal — start with a clean in-memory state
+  }
 };
