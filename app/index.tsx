@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { CameraView } from 'expo-camera';
 import { useRouter } from 'expo-router';
 import { Camera as CameraIcon, FlipHorizontal as FlipIcon } from 'lucide-react-native';
@@ -14,8 +14,8 @@ export default function CameraScreen() {
   const cameraRef = useRef<CameraView>(null);
   const router = useRouter();
 
-  if (isGranted === undefined) {
-    return <View style={styles.container}><ActivityIndicator size="large" color="white" /></View>;
+  if (isGranted === null) {
+    return <View style={styles.container}><ActivityIndicator size="large" /></View>;
   }
 
   if (isGranted === false) {
@@ -43,24 +43,25 @@ export default function CameraScreen() {
 
         if (photo) {
           // Pre-process image to optimize for OCR
+          // Currently resizes to 1000px width and compresses
           const manipulatedImage = await ImageManipulator.manipulateAsync(
             photo.uri,
             [{ resize: { width: 1000 } }],
             { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG }
           );
 
-          // Perform OCR
+          // Perform OCR (Currently MOCKED)
           const result = await extractTextFromImage(manipulatedImage.uri);
           
-          // Navigate to results
+          // Navigate to results with the extracted text
           router.push({
             pathname: '/results',
             params: { text: result.text }
           });
         }
       } catch (error) {
-        console.error('Error taking picture:', error);
-        Alert.alert('Error', 'Failed to scan image. Please try again.');
+        console.error('Error during capture/OCR flow:', error);
+        // TODO: Implement better user feedback for failures
       } finally {
         setIsScanning(false);
       }
