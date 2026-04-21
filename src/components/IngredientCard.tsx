@@ -1,72 +1,74 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { ShieldCheck, AlertTriangle, XCircle, HelpCircle } from 'lucide-react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { ChevronRight } from 'lucide-react-native';
 import { IngredientAnalysis, IngredientStatus } from '../services/analysisService';
 
 interface Props {
   ingredient: IngredientAnalysis;
+  onPress: () => void;
 }
 
-const getStatusColor = (status: IngredientStatus) => {
-  switch (status) {
-    case 'safe': return '#4caf50';
-    case 'warning': return '#ff9800';
-    case 'avoid': return '#f44336';
-    default: return '#9e9e9e';
-  }
+const STATUS_CONFIG: Record<IngredientStatus, { label: string; bg: string; text: string }> = {
+  safe:    { label: 'Safe',    bg: '#e8f5e9', text: '#2e7d32' },
+  warning: { label: 'Warning', bg: '#fff3e0', text: '#e65100' },
+  avoid:   { label: 'Avoid',   bg: '#ffebee', text: '#c62828' },
+  unknown: { label: 'Unknown', bg: '#f5f5f5', text: '#757575' },
 };
 
-const getStatusIcon = (status: IngredientStatus) => {
-  const size = 24;
-  const color = getStatusColor(status);
-  switch (status) {
-    case 'safe': return <ShieldCheck size={size} color={color} />;
-    case 'warning': return <AlertTriangle size={size} color={color} />;
-    case 'avoid': return <XCircle size={size} color={color} />;
-    default: return <HelpCircle size={size} color={color} />;
-  }
-};
-
-export const IngredientCard: React.FC<Props> = ({ ingredient }) => {
-  const color = getStatusColor(ingredient.status);
+export const IngredientCard: React.FC<Props> = ({ ingredient, onPress }) => {
+  const cfg = STATUS_CONFIG[ingredient.status];
+  const name = ingredient.name.charAt(0).toUpperCase() + ingredient.name.slice(1);
 
   return (
-    <View style={[styles.card, { borderLeftColor: color }]}>
-      <View style={styles.header}>
-        {getStatusIcon(ingredient.status)}
-        <Text style={styles.name}>{ingredient.name.charAt(0).toUpperCase() + ingredient.name.slice(1)}</Text>
+    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.7}>
+      <Text style={styles.name} numberOfLines={1}>{name}</Text>
+      <View style={styles.right}>
+        <View style={[styles.badge, { backgroundColor: cfg.bg }]}>
+          <Text style={[styles.badgeText, { color: cfg.text }]}>{cfg.label}</Text>
+        </View>
+        <ChevronRight size={16} color="#ccc" style={styles.chevron} />
       </View>
-      <Text style={styles.info}>{ingredient.info}</Text>
-    </View>
+    </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   card: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: '#fff',
-    padding: 16,
-    marginVertical: 8,
-    borderRadius: 8,
-    borderLeftWidth: 5,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    marginVertical: 4,
+    borderRadius: 12,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
     shadowRadius: 4,
     elevation: 2,
   },
-  header: {
+  name: {
+    flex: 1,
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#1a1a1a',
+    marginRight: 12,
+  },
+  right: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
   },
-  name: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginLeft: 10,
+  badge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 20,
   },
-  info: {
-    fontSize: 14,
-    color: '#666',
-    lineHeight: 20,
+  badgeText: {
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 0.3,
+  },
+  chevron: {
+    marginLeft: 6,
   },
 });
