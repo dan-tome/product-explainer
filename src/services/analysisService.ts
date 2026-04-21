@@ -37,7 +37,7 @@ export const analyzeIngredients = (text: string): IngredientAnalysis[] => {
   const rawIngredients = normalizeText(section)
     .split(',')
     .map(i => i.trim().replace(/\s+/g, ' ').toLowerCase())
-    .filter(i => i.length > 2 && /^[a-z]/i.test(i));
+    .filter(i => i.length > 3 && /^[a-zA-Z]{2}/i.test(i));
 
   return rawIngredients.map(name => {
     const matched = Object.keys(typedIngredientsData).find(key =>
