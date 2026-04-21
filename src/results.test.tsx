@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react-native';
 
 jest.mock('expo-router', () => ({
   useLocalSearchParams: jest.fn(),
+  useRouter: jest.fn(() => ({ back: jest.fn() })),
   Stack: { Screen: () => null },
 }));
 
@@ -98,7 +99,7 @@ describe('ResultsScreen', () => {
     mockAnalyze.mockResolvedValue([]);
     render(<ResultsScreen />);
     await waitFor(() =>
-      expect(screen.getByText(/surface ingredients this pass/i)).toBeTruthy(),
+      expect(screen.getByText(/nothing found this pass/i)).toBeTruthy(),
     );
   });
 

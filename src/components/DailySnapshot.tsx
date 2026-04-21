@@ -47,7 +47,7 @@ export const DailySnapshot: React.FC<Props> = ({ ingredients }) => {
         <View style={styles.inner}>
           <View style={styles.titleRow}>
             <View>
-              <Text style={styles.kicker}>Daily snapshot</Text>
+              <Text style={styles.kicker}>Scan summary</Text>
               <Text style={styles.headline}>{headlineForTone(tone)}</Text>
             </View>
             <Icon size={36} color={iconColor} strokeWidth={1.25} />
@@ -102,16 +102,17 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   headline: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#263238',
+    fontSize: 15,
+    fontWeight: '400',
+    color: '#546E7A',
     letterSpacing: -0.3,
     maxWidth: '78%',
   },
   summary: {
     marginTop: 10,
-    fontSize: 14,
-    color: '#546E7A',
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#263238',
     lineHeight: 20,
   },
   stripLabel: {

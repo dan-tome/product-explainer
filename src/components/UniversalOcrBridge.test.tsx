@@ -67,13 +67,13 @@ describe('BridgeHandoff', () => {
 });
 
 describe('ResearchSlateContainer', () => {
-  it('renders the "Research slate" kicker', () => {
+  it('does not render the removed top kicker (chrome is in DiscoveryHero)', () => {
     render(
       <ResearchSlateContainer productType="FOOD" ingredientCount={3}>
         <></>
       </ResearchSlateContainer>,
     );
-    expect(screen.getByText('Research slate')).toBeTruthy();
+    expect(screen.queryByText('Research slate')).toBeNull();
   });
 
   it('renders children', () => {
