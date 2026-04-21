@@ -14,7 +14,7 @@ HealthScan (Product Explainer) — Development Guide
 
 ## 2. Technical Stack & Standards
 
-**Framework:** React Native + Expo (SDK 54, bare workflow).
+**Framework:** React Native 0.83.6 + Expo (SDK 55, bare workflow).
 
 **Camera/Vision:**
 - `expo-camera` — live viewfinder, shutter capture, and real-time barcode scanning (`ean13`, `ean8`, `upc_a`, `upc_e`, `qr`)
@@ -238,11 +238,11 @@ All dependency changes go through `npx expo install` (not raw `npm install`) so 
 | Status | Action |
 |---|---|
 | `expo-blur` | Removed — was declared but never imported or installed |
-| `react-native-svg` | Pinned at 15.12.1 — SDK 54 ceiling; 15.15.4 available after SDK 55 upgrade |
-| `react-test-renderer` | Pinned at 19.1.0 — exact match with `react` version (no `^` range) |
-| Expo SDK 54 → 55 | Planned upgrade — all `expo-*` packages move together via `npx expo install --fix` |
-| jest 29 → 30 | Hold — major version, assess after SDK upgrade |
-| TypeScript 5.9 → 6.0 | Hold — major version, assess after SDK upgrade |
+| Expo SDK 54 → 55 | **Done** — all `expo-*` packages updated via `npx expo install --fix`; React 19.2.0, RN 0.83.6 |
+| `react-native-svg` | Updated to 15.15.3 (SDK 55 compatible) |
+| `react-test-renderer` | Pinned exactly at `19.2.0` — must always match `react` version exactly (no `^` range) |
+| jest 29 → 30 | Hold — major version, dedicated pass required |
+| TypeScript 5.9 → 6.0 | Hold — major version, dedicated pass required |
 
 **Never upgrade `react-native` independently** — it must move with the Expo SDK.
 

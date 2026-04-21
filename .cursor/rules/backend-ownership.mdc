@@ -40,7 +40,8 @@ Dependencies are being cleaned in stages. **Do not add new packages without chec
 
 - **Stage 1 — DONE:** `expo-blur` removed (was declared, never installed, never imported).
 - **Stage 2 — DONE:** `react-native-svg` confirmed at SDK 54 ceiling (15.12.1); `react-test-renderer` pinned exactly to `19.1.0` to match `react` (removed loose `^` range).
-- **Stage 3 — PLANNED:** Expo SDK 54 → 55 full upgrade (all `expo-*` move together).
+- **Stage 3 — DONE:** Expo SDK 55 upgrade complete. React 19.2.0, RN 0.83.6, all `expo-*` on SDK 55 versions. `react-test-renderer` pinned exactly to match `react` (never use `^` range for this package).
+- **Stage 4 — PLANNED:** jest 29 → 30 (major version, dedicated pass). TypeScript 5.9 → 6.0 (major version, dedicated pass).
 
 Rule: always use `npx expo install <pkg>` for runtime deps so Expo enforces SDK-compatible versions. Raw `npm install` only for dev tooling (types, jest plugins).
 

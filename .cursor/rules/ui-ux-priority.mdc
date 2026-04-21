@@ -1,0 +1,33 @@
+---
+description: Prefer UI/UX work over backend/services unless the user asks otherwise
+alwaysApply: true
+---
+
+# UI/UX first — default scope for Cursor
+
+**Default assumption:** prioritize **user-facing design and behavior** over **backend / pipeline implementation**.
+
+## Prefer (when the task is open-ended or ambiguous)
+
+- **`app/`** screens and navigation flow  
+- **`src/components/`** layout, composition, interaction, loading/empty states  
+- **`src/styles/`** Theme, motion, typography, spacing, accessibility  
+- Viewfinder / overlay / results **presentation** (including wiring props and local UI state)  
+- Copy, hierarchy, motion, and **Research Palette** usage  
+
+## Defer or minimize unless explicitly requested
+
+- New or heavy changes in **`src/services/`** (Gemini, OCR, classifier, analysis orchestration)  
+- API keys, env, or server-style logic  
+- Expanding **`src/data/`** beyond what the UI needs to render  
+- Deep pipeline refactors (“wire the whole stack end-to-end”) when the ask was visual or experiential  
+
+## How this works with `CLAUDE.md`
+
+- **`CLAUDE.md`** remains the **product and stack reference** (vision, palette rules, `Ingredient` shape, pipeline map, commands). **Do not contradict** it on constraints (e.g. no red/green traffic lights, motion from `motion.ts`).  
+- **`CLAUDE.md`** is written for **full-stack context** (e.g. Claude Code). In **this Cursor workspace**, use it to **stay correct**, but **choose UI/UX as the primary deliverable** when the user does not specify backend work.  
+- If the user wants backend work, they will say so (e.g. “change `geminiService`”, “add allergen rule”). Then services are in scope.
+
+## When unsure
+
+Prefer **mocked data, placeholders, or existing service outputs** to ship UI, and **ask one short question** before expanding backend scope.
