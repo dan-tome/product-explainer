@@ -39,7 +39,7 @@ If you hit a **real** services gap—**missing field** on a type, **insufficient
 Dependencies are being cleaned in stages. **Do not add new packages without checking the stage log below.**
 
 - **Stage 1 — DONE:** `expo-blur` removed (was declared, never installed, never imported).
-- **Stage 2 — PENDING:** `react-native-svg` patch (15.12.1 → 15.15.4), `react-test-renderer` alignment.
+- **Stage 2 — DONE:** `react-native-svg` confirmed at SDK 54 ceiling (15.12.1); `react-test-renderer` pinned exactly to `19.1.0` to match `react` (removed loose `^` range).
 - **Stage 3 — PLANNED:** Expo SDK 54 → 55 full upgrade (all `expo-*` move together).
 
 Rule: always use `npx expo install <pkg>` for runtime deps so Expo enforces SDK-compatible versions. Raw `npm install` only for dev tooling (types, jest plugins).

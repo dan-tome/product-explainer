@@ -238,8 +238,8 @@ All dependency changes go through `npx expo install` (not raw `npm install`) so 
 | Status | Action |
 |---|---|
 | `expo-blur` | Removed — was declared but never imported or installed |
-| `react-native-svg` | Pending patch 15.12.1 → 15.15.4 (Stage 2) |
-| `react-test-renderer` | Pending alignment with React version (Stage 2) |
+| `react-native-svg` | Pinned at 15.12.1 — SDK 54 ceiling; 15.15.4 available after SDK 55 upgrade |
+| `react-test-renderer` | Pinned at 19.1.0 — exact match with `react` version (no `^` range) |
 | Expo SDK 54 → 55 | Planned upgrade — all `expo-*` packages move together via `npx expo install --fix` |
 | jest 29 → 30 | Hold — major version, assess after SDK upgrade |
 | TypeScript 5.9 → 6.0 | Hold — major version, assess after SDK upgrade |
