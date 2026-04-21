@@ -44,12 +44,12 @@ const makeIngredient = (overrides: Partial<Ingredient> = {}): Ingredient => ({
 describe('DailySnapshot', () => {
   it('renders without crashing with an empty list', () => {
     render(<DailySnapshot ingredients={[]} />);
-    expect(screen.getByText('Daily snapshot')).toBeTruthy();
+    expect(screen.getByText('Scan summary')).toBeTruthy();
   });
 
   it('renders without crashing with a populated list', () => {
     render(<DailySnapshot ingredients={[makeIngredient(), makeIngredient()]} />);
-    expect(screen.getByText('Daily snapshot')).toBeTruthy();
+    expect(screen.getByText('Scan summary')).toBeTruthy();
   });
 
   it('shows "Mostly clear" headline for all-safe ingredients', () => {

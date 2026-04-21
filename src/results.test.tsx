@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react-native';
 
 jest.mock('expo-router', () => ({
   useLocalSearchParams: jest.fn(),
+  useRouter: jest.fn(() => ({ back: jest.fn() })),
   Stack: { Screen: () => null },
 }));
 
@@ -74,7 +75,9 @@ describe('ResultsScreen', () => {
 
   it('renders without crashing after loading', async () => {
     render(<ResultsScreen />);
-    await waitFor(() => expect(screen.queryByTestId('loading-indicator')).toBeNull());
+    // Positive presence check is more reliable than absence check in React 19 concurrent mode
+    await waitFor(() => expect(screen.getByText('7 ingredients')).toBeTruthy());
+    expect(screen.queryByTestId('loading-indicator')).toBeNull();
   });
 
   it('shows ingredient count in ProductPulse after loading', async () => {
@@ -96,7 +99,7 @@ describe('ResultsScreen', () => {
     mockAnalyze.mockResolvedValue([]);
     render(<ResultsScreen />);
     await waitFor(() =>
-      expect(screen.getByText(/surface ingredients this pass/i)).toBeTruthy(),
+      expect(screen.getByText(/nothing found this pass/i)).toBeTruthy(),
     );
   });
 

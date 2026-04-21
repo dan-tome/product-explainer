@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, FlatList } from 'react-native';
+import { StyleSheet, View, Text, FlatList, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams, Stack } from 'expo-router';
+import { useLocalSearchParams, Stack, useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { analyzeIngredients, detectProductType } from '../src/services/analysisService';
 import { Ingredient, ProductType } from '../src/types/product';
@@ -17,6 +17,7 @@ import {
 } from '../src/components/universalBridgeResolve';
 
 export default function ResultsScreen() {
+  const router = useRouter();
   const { text } = useLocalSearchParams<{ text: string }>();
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [productType, setProductType] = useState<ProductType>('UNKNOWN');
@@ -42,6 +43,7 @@ export default function ResultsScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <Stack.Screen options={{ title: 'Analysing…', headerStyle: { backgroundColor: '#fff' }, headerTintColor: '#1a1a1a' }} />
+
         <View testID="loading-indicator" style={styles.loaderContainer}>
           <SkeletonLoader />
         </View>
@@ -54,7 +56,7 @@ export default function ResultsScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <Stack.Screen
-        options={{ title: 'Research slate', headerStyle: { backgroundColor: '#fff' }, headerTintColor: '#1a1a1a' }}
+        options={{ title: 'Results', headerStyle: { backgroundColor: '#fff' }, headerTintColor: '#1a1a1a' }}
       />
 
       <ResearchSlateContainer
@@ -83,10 +85,13 @@ export default function ResultsScreen() {
           contentContainerStyle={styles.listContent}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyKicker}>Still scanning the label</Text>
+              <Text style={styles.emptyKicker}>Nothing found this pass</Text>
               <Text style={styles.emptyText}>
-                We didn’t surface ingredients this pass — try a steadier frame or a little more light.
+                Hold the camera closer to the ingredients list and try again.
               </Text>
+              <TouchableOpacity style={styles.rescanButton} onPress={() => router.back()}>
+                <Text style={styles.rescanButtonText}>Scan again</Text>
+              </TouchableOpacity>
             </View>
           }
         />
@@ -132,5 +137,18 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 22,
     maxWidth: 300,
+  },
+  rescanButton: {
+    marginTop: 24,
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    borderRadius: 24,
+    backgroundColor: RESEARCH_PALETTE.primary,
+  },
+  rescanButtonText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#fff',
+    letterSpacing: 0.2,
   },
 });

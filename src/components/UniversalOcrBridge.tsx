@@ -88,9 +88,6 @@ export const ResearchSlateContainer: React.FC<ResearchSlateProps> = ({
   cumulativeNote,
 }) => (
   <View style={styles.slateRoot}>
-    <View style={styles.slateHeader}>
-      <Text style={styles.slateKicker}>Research slate</Text>
-    </View>
     <DiscoveryHero productType={productType} ingredientCount={ingredientCount} />
     {cumulativeNote ? <CumulativeResearchNote note={cumulativeNote} /> : null}
     {!cumulativeNote && validatedFamily ? <ScienceNoteReveal signal={validatedFamily} /> : null}
@@ -176,16 +173,5 @@ const styles = StyleSheet.create({
   },
   slateBody: {
     flex: 1,
-  },
-  slateHeader: {
-    marginBottom: 4,
-  },
-  slateKicker: {
-    fontSize: 10,
-    fontWeight: '800',
-    letterSpacing: 1.2,
-    textTransform: 'uppercase',
-    color: RESEARCH_PALETTE.neutral,
-    opacity: 0.65,
   },
 });

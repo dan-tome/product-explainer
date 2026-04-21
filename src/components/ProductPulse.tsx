@@ -55,17 +55,17 @@ export const ProductPulse: React.FC<Props> = ({ ingredients, productType }) => {
       style={styles.container}
     >
       <PulseCard
-        label="PRODUCT TYPE"
-        value={PRODUCT_TYPE_LABEL[productType]}
-        sub={`${ingredients.length} ingredients`}
-        accent={RESEARCH_PALETTE.primary}
-        hero
-      />
-      <PulseCard
         label="ALLERGEN MATCH"
         value={allergenValue}
         sub={allergenSub}
         accent={RESEARCH_PALETTE.attention}
+        hero
+      />
+      <PulseCard
+        label="PRODUCT TYPE"
+        value={PRODUCT_TYPE_LABEL[productType]}
+        sub={`${ingredients.length} ingredients`}
+        accent={RESEARCH_PALETTE.primary}
       />
       <PulseCard
         label="PRIMARY INGREDIENT"

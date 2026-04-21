@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import * as Haptics from 'expo-haptics';
-import { Atom, Sparkles } from 'lucide-react-native';
+import { Atom, ChevronDown, Sparkles } from 'lucide-react-native';
 import { Ingredient, IngredientStatus } from '../types/product';
 import { RESEARCH_PALETTE, STATUS_COLORS } from '../styles/Theme';
 import { MOTION } from '../styles/motion';
@@ -101,6 +101,7 @@ export const IngredientCard: React.FC<Props> = ({ ingredient, compoundGroup = fa
 
   const l2MaxHeight = animL2.interpolate({ inputRange: [0, 1], outputRange: [0, L2_HEIGHT] });
   const l3MaxHeight = animL3.interpolate({ inputRange: [0, 1], outputRange: [0, L3_HEIGHT] });
+  const chevronRotate = animL2.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '180deg'] });
 
   const statusColor = ingredient.allergen_info.is_match
     ? RESEARCH_PALETTE.attention
@@ -153,6 +154,9 @@ export const IngredientCard: React.FC<Props> = ({ ingredient, compoundGroup = fa
                 </Text>
               </View>
             )}
+            <Animated.View style={[styles.chevronWrap, { transform: [{ rotate: chevronRotate }] }]}>
+              <ChevronDown size={14} color={RESEARCH_PALETTE.neutral} strokeWidth={2} />
+            </Animated.View>
           </View>
         </View>
       </Animated.View>
@@ -193,9 +197,9 @@ export const IngredientCard: React.FC<Props> = ({ ingredient, compoundGroup = fa
         <View style={styles.l3DividerWrap}>
           <View style={styles.divider} />
         </View>
-        <Text style={styles.sectionLabel}>Science Note</Text>
+        <Text style={styles.sectionLabel}>How it works</Text>
         <Text style={styles.sectionValue}>{ingredient.science_note}</Text>
-        <Text style={styles.sectionLabel}>Regulatory Flag</Text>
+        <Text style={styles.sectionLabel}>Regulated in</Text>
         <Text style={styles.sectionValue}>{ingredient.regulatory_context}</Text>
         {ingredient.literacy_flag ? (
           <>
@@ -209,7 +213,7 @@ export const IngredientCard: React.FC<Props> = ({ ingredient, compoundGroup = fa
         {edcMatch !== null && (
           <>
             <Text style={[styles.sectionLabel, { color: RESEARCH_PALETTE.secondary }]}>
-              EDC Research Note
+              Hormone disruptor concern
             </Text>
             <Text style={styles.sectionValue}>{edcMatch.concern}</Text>
           </>
@@ -266,6 +270,12 @@ const styles = StyleSheet.create({
   },
   right: {
     flexShrink: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  chevronWrap: {
+    opacity: 0.55,
   },
   badge: {
     paddingHorizontal: 10,
@@ -278,9 +288,9 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
   },
   purpose: {
-    fontSize: 13,
-    color: '#666',
-    lineHeight: 18,
+    fontSize: 14,
+    color: '#444',
+    lineHeight: 20,
   },
   purposeLead: {
     marginTop: 0,
