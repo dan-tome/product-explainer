@@ -1,0 +1,47 @@
+---
+description: Backend/services ownership — contracts and pipeline are guarded
+alwaysApply: true
+---
+
+# Backend & pipeline ownership (HealthScan)
+
+**Context:** Backend services (`src/services/`), AI pipeline (Gemini 2.5 Flash), data architecture, and **`Ingredient` schema** are owned with a high bar: **TypeScript strict**, **tests where appropriate**, **no red/green traffic lights in UI** (see `CLAUDE.md` + Theme).
+
+## Source of truth
+
+- **Service contracts and types** defined in the codebase (and documented in **`CLAUDE.md`**) are authoritative for how data flows. **Do not redefine or silently change** public function signatures, `Ingredient` fields, or analysis orchestration behavior without an explicit request to do so.
+
+## What not to do by default
+
+- Do **not** modify **`src/services/`**, **`geminiService`**, classifier/analysis pipeline, OCR wrappers, or **cross-cutting data flow** to “just support” a UI task—unless the user **explicitly** asks for pipeline/backend work or clearly authorizes contract changes.
+- Do **not** “simplify” the pipeline, swap models, or weaken validation for convenience.
+
+## When UI needs backend
+
+- Prefer **UI-only** changes: props, layout, loading states, calling **existing** services as documented.
+- If the UI truly needs a **new contract** or pipeline change, **state the gap** and **ask** before implementing—do not assume scope.
+
+## Contract gaps (clean handoff)
+
+If you hit a **real** services gap—**missing field** on a type, **insufficient data** from the pipeline, **Gemini output shape** that doesn’t support the UI—**do not patch around it** in components (no “temporary” casts, duplicated parsing, or fake defaults that belong in the pipeline).
+
+**Do:** describe the gap clearly (what the UI needs vs what the contract returns) so the contract can be **extended properly** in `src/services/` and types.
+
+**Don’t:** grow component-level workarounds that should be a schema or service change.
+
+## Coexistence with UI/UX priority
+
+- **`ui-ux-priority.mdc`** still biases work toward screens/components/styles when tasks are vague.
+- This rule adds: **even when touching `app/` or components, leave services and pipeline intact** unless the task explicitly includes them.
+
+## Dependency hygiene (active work — 2026-04-21)
+
+Dependencies are being cleaned in stages. **Do not add new packages without checking the stage log below.**
+
+- **Stage 1 — DONE:** `expo-blur` removed (was declared, never installed, never imported).
+- **Stage 2 — PENDING:** `react-native-svg` patch (15.12.1 → 15.15.4), `react-test-renderer` alignment.
+- **Stage 3 — PLANNED:** Expo SDK 54 → 55 full upgrade (all `expo-*` move together).
+
+Rule: always use `npx expo install <pkg>` for runtime deps so Expo enforces SDK-compatible versions. Raw `npm install` only for dev tooling (types, jest plugins).
+
+User instructions override these defaults.

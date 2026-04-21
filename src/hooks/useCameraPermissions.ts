@@ -11,7 +11,7 @@ export function useCameraPermissions() {
   }, [permission]);
 
   return {
-    isGranted: permission?.granted,
+    isGranted: permission ? permission.granted : null,
     canAskAgain: permission?.canAskAgain,
     requestPermission,
   };

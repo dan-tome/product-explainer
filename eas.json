@@ -12,6 +12,14 @@
         "buildType": "apk"
       }
     },
+    "healthscan-2026": {
+      "android": {
+        "buildType": "apk"
+      },
+      "ios": {
+        "simulator": false
+      }
+    },
     "production": {}
   },
   "submit": {
