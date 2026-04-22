@@ -199,7 +199,7 @@ describe.skip('ResultsScreen — empty state UI', () => {
   });
 });
 
-describe.skip('ResultsScreen — analysis error handling', () => {
+describe('ResultsScreen — analysis error handling', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockParams.mockReturnValue({ text: 'Water, Glycerin' });
@@ -208,13 +208,19 @@ describe.skip('ResultsScreen — analysis error handling', () => {
 
   it('does not crash when analyzeIngredients rejects', async () => {
     mockAnalyze.mockRejectedValue(new Error('Network error'));
-    // TODO: results.tsx currently has no catch — after adding one, assert graceful UI
-    // expect(() => render(<ResultsScreen />)).not.toThrow();
+    expect(() => render(<ResultsScreen />)).not.toThrow();
   });
 
-  it('shows an error or empty state when analysis rejects', async () => {
+  it('exits the loading state when analysis rejects', async () => {
     mockAnalyze.mockRejectedValue(new Error('Gemini timeout'));
-    // TODO: assert fallback UI or empty state appears rather than hanging in loading
+    render(<ResultsScreen />);
+    await waitFor(() => expect(screen.getByText('Scan again')).toBeTruthy());
+  });
+
+  it('shows the empty state when analysis rejects', async () => {
+    mockAnalyze.mockRejectedValue(new Error('Gemini timeout'));
+    render(<ResultsScreen />);
+    await waitFor(() => expect(screen.getByText(/nothing found this pass/i)).toBeTruthy());
   });
 });
 
