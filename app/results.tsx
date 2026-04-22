@@ -27,17 +27,21 @@ export default function ResultsScreen() {
   useEffect(() => {
     const raw = text || '';
     setProductType(detectProductType(raw));
-    analyzeIngredients(raw).then(result => {
-      setIngredients(result);
-      setLoading(false);
-      const pt = detectProductType(raw);
-      // First Light slate: selection tick (maps to UISelectionFeedback on iOS / light tick on Android)
-      if (pt === 'UNKNOWN' && result.length > 0) {
-        Haptics.selectionAsync();
-      } else {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      }
-    });
+    analyzeIngredients(raw)
+      .then(result => {
+        setIngredients(result);
+        setLoading(false);
+        const pt = detectProductType(raw);
+        // First Light slate: selection tick (maps to UISelectionFeedback on iOS / light tick on Android)
+        if (pt === 'UNKNOWN' && result.length > 0) {
+          Haptics.selectionAsync();
+        } else {
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        }
+      })
+      .catch(() => {
+        setLoading(false);
+      });
   }, [text]);
 
   if (loading) {
