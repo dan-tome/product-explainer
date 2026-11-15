@@ -29,9 +29,11 @@ const normalizeText = (text: string): string =>
     .replace(/[|\n\r]+/g, ',')
     .replace(/,{2,}/g, ',');
 
-export const analyzeIngredients = async (text: string): Promise<Ingredient[]> => {
-  if (!text) return [];
-
+/**
+ * Deterministic, pre-LLM half of the pipeline: INCI normalise → classify → extract → tokenise.
+ * Exported so the offline eval tier can score it without calling Gemini.
+ */
+export const prepareLabel = (text: string): { productType: ProductType; tokens: string[] } => {
   const textForParse = applyInciSynonymsToLabelText(text);
   const productType = detectProductType(textForParse);
   const section = extractIngredientsSection(textForParse);
@@ -39,6 +41,13 @@ export const analyzeIngredients = async (text: string): Promise<Ingredient[]> =>
     .split(',')
     .map(i => i.trim().replace(/\s+/g, ' ').toLowerCase())
     .filter(i => i.length > 3 && /^[a-zA-Z]{2}/i.test(i));
+  return { productType, tokens };
+};
+
+export const analyzeIngredients = async (text: string): Promise<Ingredient[]> => {
+  if (!text) return [];
+
+  const { productType, tokens } = prepareLabel(text);
 
   if (tokens.length === 0) return [];
 

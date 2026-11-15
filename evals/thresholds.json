@@ -1,0 +1,10 @@
+{
+  "$comment": "Ratchet floors for the offline eval tier. CI fails if any metric drops below its floor. Raise a floor in the same PR that improves a metric; never lower one without a written reason.",
+  "offline": {
+    "classificationAccuracy": 0.33,
+    "tokenRecall": 1.0,
+    "noiseRejection": 0.66,
+    "allergenSurvival": 0.66,
+    "edcDetection": 1.0
+  }
+}

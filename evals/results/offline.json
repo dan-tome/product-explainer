@@ -1,0 +1,262 @@
+{
+  "metrics": {
+    "classificationAccuracy": {
+      "passed": 4,
+      "total": 12
+    },
+    "tokenRecall": {
+      "passed": 64,
+      "total": 64
+    },
+    "noiseRejection": {
+      "passed": 8,
+      "total": 12
+    },
+    "allergenSurvival": {
+      "passed": 4,
+      "total": 6
+    },
+    "edcDetection": {
+      "passed": 3,
+      "total": 3
+    }
+  },
+  "cases": [
+    {
+      "id": "food-crisps",
+      "tokens": [
+        "potatoes",
+        "vegetable oils",
+        "salt",
+        "potassium chloride",
+        "paprika powder",
+        "sugar",
+        "onion powder."
+      ],
+      "productType": {
+        "expected": "FOOD",
+        "actual": "UNKNOWN"
+      },
+      "missingTokens": [],
+      "leakedText": [],
+      "lostAllergens": [],
+      "missedEdcs": []
+    },
+    {
+      "id": "food-biscuit-allergens",
+      "tokens": [
+        "wheat flour",
+        "sugar",
+        "palm oil",
+        "whey powder",
+        "glucose syrup",
+        "raising agents",
+        "salt",
+        "egg."
+      ],
+      "productType": {
+        "expected": "FOOD",
+        "actual": "UNKNOWN"
+      },
+      "missingTokens": [],
+      "leakedText": [],
+      "lostAllergens": [],
+      "missedEdcs": []
+    },
+    {
+      "id": "food-noodles-hidden-allergens",
+      "tokens": [
+        "noodles",
+        "soy sauce",
+        "sesame oil",
+        "spring onion."
+      ],
+      "productType": {
+        "expected": "FOOD",
+        "actual": "UNKNOWN"
+      },
+      "missingTokens": [],
+      "leakedText": [],
+      "lostAllergens": [
+        "Wheat",
+        "Egg"
+      ],
+      "missedEdcs": []
+    },
+    {
+      "id": "food-chocolate-ocr-noise",
+      "tokens": [
+        "milk chocolate",
+        "lngredients: sugar",
+        "cocoa butter",
+        "whole milk powder",
+        "cocoa mass",
+        "emulsifier",
+        "vanilla extract.",
+        "milk chocolate contains cocoa solids 30% minimum."
+      ],
+      "productType": {
+        "expected": "FOOD",
+        "actual": "UNKNOWN"
+      },
+      "missingTokens": [],
+      "leakedText": [
+        "30% minimum"
+      ],
+      "lostAllergens": [],
+      "missedEdcs": []
+    },
+    {
+      "id": "food-granola-marketing",
+      "tokens": [
+        "oat flakes",
+        "honey",
+        "sunflower seeds",
+        "dried apple. net wt 500g. best before: see top of pack."
+      ],
+      "productType": {
+        "expected": "FOOD",
+        "actual": "UNKNOWN"
+      },
+      "missingTokens": [],
+      "leakedText": [
+        "net wt",
+        "best before"
+      ],
+      "lostAllergens": [],
+      "missedEdcs": []
+    },
+    {
+      "id": "food-supplement",
+      "tokens": [
+        "magnesium citrate",
+        "bulking agent",
+        "capsule shell",
+        "anti-caking agent ."
+      ],
+      "productType": {
+        "expected": "FOOD",
+        "actual": "UNKNOWN"
+      },
+      "missingTokens": [],
+      "leakedText": [],
+      "lostAllergens": [],
+      "missedEdcs": []
+    },
+    {
+      "id": "cosmetic-moisturiser-parabens",
+      "tokens": [
+        "aqua",
+        "glycerin",
+        "cetearyl alcohol",
+        "caprylic/capric triglyceride",
+        "dimethicone",
+        "phenoxyethanol",
+        "methylparaben",
+        "propylparaben",
+        "tocopherol",
+        "fragrance."
+      ],
+      "productType": {
+        "expected": "COSMETIC",
+        "actual": "COSMETIC"
+      },
+      "missingTokens": [],
+      "leakedText": [],
+      "lostAllergens": [],
+      "missedEdcs": []
+    },
+    {
+      "id": "cosmetic-sunscreen-actives",
+      "tokens": [
+        "oxybenzone 6%",
+        "avobenzone 3%",
+        "octinoxate 7.5%"
+      ],
+      "productType": {
+        "expected": "COSMETIC",
+        "actual": "COSMETIC"
+      },
+      "missingTokens": [],
+      "leakedText": [],
+      "lostAllergens": [],
+      "missedEdcs": []
+    },
+    {
+      "id": "cosmetic-shampoo-sensitisers",
+      "tokens": [
+        "aqua",
+        "sodium laureth sulfate",
+        "cocamidopropyl betaine",
+        "sodium chloride",
+        "methylisothiazolinone",
+        "citric acid",
+        "fragrance",
+        "limonene",
+        "linalool."
+      ],
+      "productType": {
+        "expected": "COSMETIC",
+        "actual": "COSMETIC"
+      },
+      "missingTokens": [],
+      "leakedText": [],
+      "lostAllergens": [],
+      "missedEdcs": []
+    },
+    {
+      "id": "cosmetic-french-inci",
+      "tokens": [
+        "ingrédients: water",
+        "glycérine",
+        "oil d'amande douce",
+        "fragrance",
+        "tocophérol. rincer abondamment."
+      ],
+      "productType": {
+        "expected": "COSMETIC",
+        "actual": "UNKNOWN"
+      },
+      "missingTokens": [],
+      "leakedText": [
+        "rincer"
+      ],
+      "lostAllergens": [],
+      "missedEdcs": []
+    },
+    {
+      "id": "household-drain-unblocker",
+      "tokens": [
+        "sodium hydroxide 30%",
+        "water."
+      ],
+      "productType": {
+        "expected": "HOUSEHOLD",
+        "actual": "COSMETIC"
+      },
+      "missingTokens": [],
+      "leakedText": [],
+      "lostAllergens": [],
+      "missedEdcs": []
+    },
+    {
+      "id": "household-laundry-detergent",
+      "tokens": [
+        "aqua",
+        "sodium dodecylbenzenesulfonate",
+        "laureth-7",
+        "subtilisin",
+        "benzisothiazolinone",
+        "fragrance."
+      ],
+      "productType": {
+        "expected": "HOUSEHOLD",
+        "actual": "HOUSEHOLD"
+      },
+      "missingTokens": [],
+      "leakedText": [],
+      "lostAllergens": [],
+      "missedEdcs": []
+    }
+  ]
+}

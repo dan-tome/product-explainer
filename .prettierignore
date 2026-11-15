@@ -8,3 +8,4 @@ ios/
 *.md
 assets/
 .gitleaks.toml
+evals/results/

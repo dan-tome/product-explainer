@@ -10,7 +10,7 @@ module.exports = defineConfig([
     ignores: ['node_modules/**', 'dist/**', '.expo/**', 'android/**', 'ios/**', 'coverage/**'],
   },
   {
-    files: ['**/*.test.ts', '**/*.test.tsx', 'jest.setup.js', '__mocks__/**'],
+    files: ['**/*.test.ts', '**/*.test.tsx', '**/*.eval.ts', 'jest.setup.js', '__mocks__/**'],
     languageOptions: {
       globals: {
         jest: 'readonly',
