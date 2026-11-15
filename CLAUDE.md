@@ -200,6 +200,10 @@ EXPO_PUBLIC_GEMINI_API_KEY=your_key_here
 
 ## 10. Local Development Commands
 
+CI (`.github/workflows/ci.yml`) runs `npm run typecheck` and `npm test -- --ci` on every PR and push to `main`.
+
+The active portfolio roadmap and handoff notes live in `docs/FABLE_HANDOFF.md`.
+
 ```bash
 # Install dependencies
 npm install
@@ -222,6 +226,10 @@ npm test
 # Tests (watch mode)
 npm run test:watch
 
+# Typecheck only / typecheck + tests (what CI runs)
+npm run typecheck
+npm run verify
+
 # EAS cloud build — preview APK
 npm run build:android
 ```
@@ -241,7 +249,7 @@ All dependency changes go through `npx expo install` (not raw `npm install`) so 
 | `react-native-svg` | **Done** — 15.15.3 (SDK 55 compatible) |
 | `react-test-renderer` | **Done** — pinned exactly at `19.2.5` — must always match `react` version exactly (no `^` range) |
 | jest 29 → 30 | **Done** — `jest-watch-typeahead` peer conflict resolved via `overrides`; expo winter runtime lazy-getter conflict resolved by locking Node.js globals in `jest.setup.js` as non-configurable before expo loads |
-| TypeScript 5.9 → 6.0 | **Done** — upgraded to `^6.0.3`; all 192 tests pass with zero type errors |
+| TypeScript 5.9 → 6.0 | **Done** — upgraded to `^6.0.3`. TS 6 defaults `types` to `[]`, so `tsconfig.json` opts in `"types": ["jest"]` (with `@types/jest`) — without it test files emit ~800 errors. `npm run typecheck` is clean; 196 tests pass, 74 skipped stubs (2026-11-15) |
 
 **Never upgrade `react-native` independently** — it must move with the Expo SDK.
 

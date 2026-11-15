@@ -18,11 +18,10 @@ const makeIngredient = (overrides: Partial<Ingredient> = {}): Ingredient => ({
 });
 
 const makeEdc = (): EDCMatch => ({
-  name: 'Methylparaben',
+  ingredient: 'Methylparaben',
   family: 'Parabens',
   concern: 'Estrogen mimic',
   regulation: 'Restricted in EU',
-  isRespiratoryHazard: false,
 });
 
 describe.skip('hasCompoundExposure', () => {

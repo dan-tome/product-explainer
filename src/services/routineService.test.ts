@@ -13,6 +13,7 @@ import {
   addScan, removeScan, getCompoundExposures,
   getScannedProducts, getRoutineSummary, clearRoutine, loadRoutine,
 } from './routineService';
+import type { ScannedProduct } from './routineService';
 import { Ingredient } from '../types/product';
 
 const mockCheckEDC = checkEDC as jest.Mock;
