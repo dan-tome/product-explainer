@@ -87,7 +87,7 @@ EXPO_PUBLIC_GEMINI_API_KEY=your_key_here
 
 | Milestone | Focus | Status |
 |---|---|---|
-| M1 | Public-ready repo: CI gates, real tests, secret scanning, disclaimer | ✅ Done |
+| M1 | Public-ready repo: CI gates, real tests, secret scanning, disclaimer | In review |
 | M2 | Serverless TypeScript back end (Azure Functions) holding the AI key; shared validated contract | Planned |
 | M3 | LLM evals in CI: golden labels, accuracy and hallucination scoring, planted faults | Planned |
 | M4 | Mobile craft: offline cache, permission states, performance on low-end devices, E2E tests | Planned |
