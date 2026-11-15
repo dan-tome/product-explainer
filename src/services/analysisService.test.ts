@@ -58,9 +58,35 @@ describe('analyzeIngredients', () => {
     expect(result[0].allergen_info.alias_detected).toBe('Milk');
   });
 
-  it('strips parenthetical sub-ingredients before passing to Gemini', async () => {
+  it('flattens compound ingredients so sub-ingredients reach Gemini', async () => {
     await analyzeIngredients('INGREDIENTS: Vegetable Oils (Sunflower, Rapeseed), Salt');
-    expect(mockAnalyzeWithGemini).toHaveBeenCalledWith(['vegetable oils', 'salt'], 'UNKNOWN');
+    expect(mockAnalyzeWithGemini).toHaveBeenCalledWith(
+      ['vegetable oils', 'sunflower', 'rapeseed', 'salt'],
+      'UNKNOWN',
+    );
+  });
+
+  it('keeps allergens declared only inside parentheses (nested and bracketed)', async () => {
+    await analyzeIngredients(
+      'INGREDIENTS: Noodles (Wheat Flour, Egg [Free Range]), Whey Powder (Milk)',
+    );
+    const called = mockAnalyzeWithGemini.mock.calls[0][0];
+    expect(called).toEqual(
+      expect.arrayContaining(['noodles', 'wheat flour', 'egg', 'whey powder', 'milk']),
+    );
+  });
+
+  it('tolerates unbalanced OCR parentheses', async () => {
+    await analyzeIngredients('INGREDIENTS: Sugar, Emulsifier (Soya Lecithin, Salt');
+    expect(mockAnalyzeWithGemini).toHaveBeenCalledWith(
+      ['sugar', 'emulsifier', 'soya lecithin', 'salt'],
+      'UNKNOWN',
+    );
+  });
+
+  it('sends each repeated sub-ingredient once', async () => {
+    await analyzeIngredients('INGREDIENTS: Wheat Flour (Wheat Flour, Iron), Salt');
+    expect(mockAnalyzeWithGemini).toHaveBeenCalledWith(['wheat flour', 'iron', 'salt'], 'UNKNOWN');
   });
 
   it('normalises pipe separators before passing to Gemini', async () => {
@@ -73,13 +99,14 @@ describe('analyzeIngredients', () => {
     expect(mockAnalyzeWithGemini).toHaveBeenCalledWith(['potatoes', 'salt'], 'UNKNOWN');
   });
 
-  it('filters tokens shorter than 4 chars or not starting with two letters', async () => {
-    await analyzeIngredients('INGREDIENTS: Water, 150g Sugar, Ab, Salt');
+  it('filters tokens shorter than 3 chars or not starting with two letters', async () => {
+    await analyzeIngredients('INGREDIENTS: Water, 150g Sugar, Ab, Egg, Salt');
     const called = mockAnalyzeWithGemini.mock.calls[0][0];
     expect(called).toContain('water');
     expect(called).toContain('salt');
     expect(called).not.toContain('150g sugar');
     expect(called).not.toContain('ab');
+    expect(called).toContain('egg');
   });
 
   it('detects FOOD product type from nutrition facts keywords', async () => {

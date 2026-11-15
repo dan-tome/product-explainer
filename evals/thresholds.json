@@ -4,7 +4,7 @@
     "classificationAccuracy": 0.33,
     "tokenRecall": 1.0,
     "noiseRejection": 0.66,
-    "allergenSurvival": 0.66,
+    "allergenSurvival": 1.0,
     "edcDetection": 1.0
   }
 }

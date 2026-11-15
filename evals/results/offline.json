@@ -13,7 +13,7 @@
       "total": 12
     },
     "allergenSurvival": {
-      "passed": 4,
+      "passed": 6,
       "total": 6
     },
     "edcDetection": {
@@ -27,6 +27,8 @@
       "tokens": [
         "potatoes",
         "vegetable oils",
+        "sunflower",
+        "rapeseed",
         "salt",
         "potassium chloride",
         "paprika powder",
@@ -46,11 +48,18 @@
       "id": "food-biscuit-allergens",
       "tokens": [
         "wheat flour",
+        "calcium carbonate",
+        "iron",
+        "niacin",
+        "thiamin",
         "sugar",
         "palm oil",
         "whey powder",
+        "milk",
         "glucose syrup",
         "raising agents",
+        "sodium bicarbonate",
+        "ammonium bicarbonate",
         "salt",
         "egg."
       ],
@@ -67,7 +76,13 @@
       "id": "food-noodles-hidden-allergens",
       "tokens": [
         "noodles",
+        "wheat flour",
+        "egg",
+        "salt",
         "soy sauce",
+        "water",
+        "soybeans",
+        "wheat",
         "sesame oil",
         "spring onion."
       ],
@@ -77,10 +92,7 @@
       },
       "missingTokens": [],
       "leakedText": [],
-      "lostAllergens": [
-        "Wheat",
-        "Egg"
-      ],
+      "lostAllergens": [],
       "missedEdcs": []
     },
     {
@@ -92,6 +104,7 @@
         "whole milk powder",
         "cocoa mass",
         "emulsifier",
+        "soya lecithin",
         "vanilla extract.",
         "milk chocolate contains cocoa solids 30% minimum."
       ],
@@ -131,8 +144,11 @@
       "tokens": [
         "magnesium citrate",
         "bulking agent",
+        "microcrystalline cellulose",
         "capsule shell",
-        "anti-caking agent ."
+        "hydroxypropyl methylcellulose",
+        "anti-caking agent",
+        "magnesium stearate"
       ],
       "productType": {
         "expected": "FOOD",

@@ -14,20 +14,16 @@ const extractIngredientsSection = (text: string): string => {
   return match ? match[1] : text;
 };
 
-const removeParentheticals = (text: string): string => {
-  let result = text;
-  let prev = '';
-  while (prev !== result) {
-    prev = result;
-    result = result.replace(/\([^()]*\)/g, '').replace(/\[[^\[\]]*\]/g, '');
-  }
-  return result;
-};
-
+/**
+ * Compound ingredients are flattened, not discarded: "Noodles (Wheat Flour, Egg)" yields
+ * noodles, wheat flour, egg. Labels often declare allergens only inside the parentheses,
+ * and anything dropped here can never be explained or flagged downstream.
+ * Brackets become separators, which also tolerates unbalanced OCR output.
+ */
 const normalizeText = (text: string): string =>
-  removeParentheticals(text)
-    .replace(/[|\n\r]+/g, ',')
-    .replace(/,{2,}/g, ',');
+  text.replace(/[()[\]|\n\r]+/g, ',').replace(/,{2,}/g, ',');
+
+const MIN_TOKEN_LENGTH = 3; // keeps short allergens and foods: egg, soy, oat
 
 /**
  * Deterministic, pre-LLM half of the pipeline: INCI normalise → classify → extract → tokenise.
@@ -40,8 +36,8 @@ export const prepareLabel = (text: string): { productType: ProductType; tokens: 
   const tokens = normalizeText(section)
     .split(',')
     .map(i => i.trim().replace(/\s+/g, ' ').toLowerCase())
-    .filter(i => i.length > 3 && /^[a-zA-Z]{2}/i.test(i));
-  return { productType, tokens };
+    .filter(i => i.length >= MIN_TOKEN_LENGTH && /^[a-zA-Z]{2}/i.test(i));
+  return { productType, tokens: [...new Set(tokens)] };
 };
 
 export const analyzeIngredients = async (text: string): Promise<Ingredient[]> => {
