@@ -42,3 +42,7 @@ yarn-error.*
 
 # local agent settings (may contain machine paths / secrets)
 .claude/settings.local.json
+
+# IDE + scratch
+.idea/
+temp/
