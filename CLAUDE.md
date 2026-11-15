@@ -202,7 +202,7 @@ EXPO_PUBLIC_GEMINI_API_KEY=your_key_here
 
 CI (`.github/workflows/ci.yml`) runs `npm run typecheck` and `npm test -- --ci` on every PR and push to `main`.
 
-The active portfolio roadmap and handoff notes live in `docs/FABLE_HANDOFF.md`.
+The active portfolio roadmap and handoff notes live in `docs/HANDOFF.md`.
 
 ```bash
 # Install dependencies
