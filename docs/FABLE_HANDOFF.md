@@ -1,83 +1,134 @@
-# Handoff: HealthScan portfolio push
+# Handoff: HealthScan portfolio build
 
-**Prepared:** 2026-11-15 · **Branch:** `ccr-da48948f-e0dz4i` · **Read with:** `CLAUDE.md` (product facts, constraints), `PROJECT_DNA.md` (vision)
+**Updated:** 2026-11-15 · **Branch:** `ccr-da48948f-e0dz4i` · **Read with:** `CLAUDE.md` (product facts, constraints), `PROJECT_DNA.md` (vision)
 
 ## Goal
 
-Dan is changing jobs. This repo needs to work as a **portfolio piece**: something a hiring manager or senior engineer can look at for about 5 minutes and come away convinced of product sense, engineering rigour and practical AI engineering. Rank every task by *how much it changes that 5-minute impression*, not by feature count.
+HealthScan is a public portfolio piece. A hiring manager should be able to look at it for about 5 minutes and come away convinced of four things: TypeScript end to end, rigorous LLM engineering, mobile craft, and responsible handling of health information. Rank every task by how much it changes that 5-minute impression.
 
-**Career context:** Dan's CV and career info live in a separate `work` repo. It was **deliberately not cloned**. Don't pull it in unless a task really needs it (for example, tailoring the README "About the author" section or matching the roadmap to target roles). Ask Dan first.
+**Public-safe rule:** this repo will be public. Never write employer names, colleague names or personal career details into code, docs, commits or PRs. The career brief that shaped this plan stays private and isn't needed to execute it.
+
+**Budget rule:** £0. Use free tiers only (Azure free/consumption plan, GitHub Actions, EAS free tier, Sentry free tier). No paid developer accounts: no Google Play, no Apple TestFlight.
 
 ---
 
-## Verified baseline (2026-11-15)
+## Portfolio goals (every milestone must advance at least one)
 
-| Check | Result |
+| ID | Goal |
 |---|---|
-| `npm ci` | ✅ clean on Node 22 |
-| `npm run typecheck` | ✅ 0 errors *(was ~800, fixed in this session)* |
-| `npm test` | ✅ 196 passed, **74 skipped** (9 stub suites) |
-| CI | ✅ added at `.github/workflows/ci.yml` (typecheck + tests); not yet run on GitHub |
-| Lint | ❌ no ESLint/Prettier config |
-| Runnable without a phone | ❌ native-only (ML Kit, camera); no web demo |
-
-**Fixed this session:**
-- TS 6 defaults `compilerOptions.types` to `[]`, so jest globals were invisible to `tsc`. Added `@types/jest` and `"types": ["jest"]` in `tsconfig.json`.
-- `sessionSnapshotExposure.test.ts`: the `EDCMatch` fixture used the old field names (`name`, `isRespiratoryHazard`), so it was changed to `ingredient`.
-- `routineService.test.ts`: added the missing `ScannedProduct` type import.
-- Added `typecheck` and `verify` npm scripts. Updated `CLAUDE.md`.
+| G1 | A shipped, installable consumer mobile app |
+| G2 | Public code a reviewer can read and run |
+| G3 | LLM features in a product: structured output, evals, cost/latency, safety |
+| G4 | A production TypeScript serverless back end |
+| G5 | Mobile-specific craft: offline, camera/permissions, low-end performance, E2E |
+| G6 | Product metrics, UX ownership, accessibility |
+| G7 | Responsible work in a new domain (health) |
 
 ---
 
-## Findings a reviewer would notice
+## Architecture
 
-1. **API key ships in the client bundle.** `src/services/geminiService.ts:95` reads `EXPO_PUBLIC_GEMINI_API_KEY`, and `EXPO_PUBLIC_*` values get inlined into the JS bundle. This is the first thing a senior reviewer flags.
-2. **Errors from the AI are swallowed silently.** `analyzeWithGemini` uses `catch {}` and returns placeholder ingredients ("Function not identified."). The UI can't tell a real result from a degraded one. Nothing is logged and there's no retry or timeout.
-3. **Index misalignment bug.** The prompt tells Gemini to *omit* non-ingredient tokens. The fallback then uses `ingredients[i]` (`geminiService.ts:100`), which pairs the wrong token with each result as soon as anything gets dropped.
-4. **No structured output or validation.** The code runs `JSON.parse` on free text. Gemini supports `responseMimeType: 'application/json'` plus `responseSchema`. Nothing checks the response shape at runtime.
-5. **No AI evaluation.** There's no way to tell whether a prompt change made results better or worse.
-6. **Repo hygiene.** `temp/` screenshots and `.idea/` are committed. `.claude/settings.local.json` contains Windows-local paths. `.cursor/rules/backend-ownership.mdc` still mentions SDK 54 versions and "192 tests".
-7. **Test debt.** 74 `describe.skip` stubs (`DiscoveryHero`, `SessionSnapshotToast`, `CompoundGroupFrame`, `ScienceNoteReveal`, `CumulativeResearchNote`, `TransparencySandwich`, `sessionSnapshotExposure`, `useCameraPermissions`, `app/index`). Either implement them or delete them. Skipped stubs look worse than no tests.
-8. **The README has no visuals**, and no "why" section explaining the design decisions (research palette instead of traffic lights, on-device OCR, three-tier disclosure).
+```
+┌──────────────────── Expo app (strict TS) ─────────────────────┐
+│ Camera → ML Kit OCR (on device) → INCI normalise → classify  │
+│ → tokenise → local cache lookup (token + promptVersion)       │
+│        │ cache miss: send TEXT tokens only, never the image   │
+└────────┼──────────────────────────────────────────────────────┘
+         ▼  HTTPS POST /analyze   (contract v1)
+┌──────── Azure Functions (Node 22, TypeScript) ────────────────┐
+│ Zod-validate request → rate limit → Gemini 2.5 Flash          │
+│ (responseSchema, versioned prompt) → Zod-validate response    │
+│ → join results by echoed token (not by position)              │
+│ → { ingredients, meta: promptVersion, model, latency, cost }  │
+│ Key in Key Vault / app settings · App Insights · Bicep IaC    │
+└───────────────────────────────────────────────────────────────┘
+         ▲ the same contract + prompts are imported by
+┌──────── shared/ ──────────┐   ┌──────── evals/ ────────────────┐
+│ contract/ Zod schemas v1  │   │ golden labels → scorer         │
+│ prompts/  v1, v2…         │   │ replay tier: every PR          │
+└───────────────────────────┘   │ live tier: prompt PRs, nightly │
+                                └────────────────────────────────┘
+```
+
+**Decisions (already made, don't reopen):**
+- **Folder layout:** the app stays at the repo root. Add `server/`, `shared/` and `evals/`. No monorepo move.
+- **One Zod contract** in `shared/contract`, imported by the app, the server and the evals. A dependency-direction check in CI (dependency-cruiser or ESLint boundaries) stops `app/`/`src/` importing `server/` and vice versa.
+- **Allergen and EDC logic stays on the device**, deterministic and unit-tested. The LLM only supplies the explanations.
+- **Sources come from a curated reference table** in `src/data/`, with the model choosing from it. LLMs make up citations, so they never generate sources.
+- **No A/B tests**, because there aren't enough real users for a result to mean anything. Do funnel metrics and telemetry instead.
+- **Distribution:** an EAS preview APK linked from the README, plus a web demo on GitHub Pages that replays recorded responses. No app stores.
+- **E2E:** Maestro (simpler with Expo than Detox).
+- **Contract changes** (for example, adding `degraded` and `confidence` to `Ingredient`) are explicitly authorised by this plan. Update `src/types/product.ts`, `shared/contract` and `CLAUDE.md` in the same PR.
+
+---
+
+## Evals: parity testing for the LLM (the centrepiece)
+
+| Tier | Runs | Network | Checks |
+|---|---|---|---|
+| **Replay** | Every PR | None (recorded responses) | Schema validity, joining by token, allergen merge, degraded-state handling |
+| **Live** | PRs touching `shared/prompts` or the contract, plus nightly; only on `main` or labelled PRs (no fork access to secrets) | Real Gemini through the function | `common_name` accuracy, `risk_family` recall on the hazard set, hallucination rate, safety floor, p95 latency, cost per scan |
+| **Planted faults** | Script (`npm run evals:faults`) | Either | Inject known faults into the prompt or the post-processor, count how many cases catch each one, and publish the table |
+
+How the live-tier checks work:
+- **Hallucination rate:** any output ingredient that can't be traced back to an input token counts as a hallucination.
+- **Safety floor:** a known hazard must never come back as `safe`.
+
+Thresholds live in `evals/thresholds.json` and block the merge. Results are written to `evals/results/`, published to GitHub Pages, and summarised in the README.
 
 ---
 
-## Recommended roadmap (priority order)
+## Milestones
 
-### P0: Make it viewable in 2 minutes
-**Web demo mode, deployed.** Run Expo web with a `DEMO` path: pick from 4 to 6 bundled sample labels (food, cosmetic, household, one tricky French/Latin INCI one). They go through the real pipeline from `analyzeIngredients(text)` onward, skipping camera and OCR. Use **recorded Gemini fixtures** so the demo needs no key and costs nothing. Deploy to GitHub Pages from CI and link it at the top of the README.
-- Camera, ML Kit and haptics are native-only. Guard them with `Platform.OS` or `.web.tsx` files rather than ripping them out.
-- Respect the Theme/motion rules in `CLAUDE.md`. No red/green.
+Execute in order. Each milestone is about 10 to 20 small, reviewable commits or PRs.
 
-### P1: AI engineering, done properly (the main talent signal)
-1. **Server-side key.** Add a small proxy (Cloudflare Worker or Vercel function) under `server/`. It holds the key, rate-limits requests, and the app calls it. Document the threat model in a short ADR.
-2. **Structured output + validation.** Use `responseSchema` and a runtime guard (zod or hand-rolled) that maps to `Ingredient`. Have the model echo the source token so results join by token, not by index (fixes finding 3).
-3. **Honest failure states.** Add timeout, one retry with backoff, and a `degraded` flag surfaced in the UI as a calm, palette-coloured notice. This is a contract change, so update `src/types/product.ts` and `CLAUDE.md` together (per `.cursor/rules/backend-ownership.mdc`).
-4. **Eval harness.** Add `evals/` with golden labels → expected `common_name` / `risk_family` / `status`, plus a script that scores a prompt version. Even 15 cases and a results table in the README make a strong signal.
-5. **Cache** results per normalised token in AsyncStorage. This is cheaper and faster on repeat scans.
-
-### P2: Complete the product story
-- **Barcode → Open Food Facts lookup.** `PROJECT_DNA.md` already describes the barcode-first hybrid. GTIN ghost labels are display-only today (`src/data/gtinMicroLiteracy.ts`).
-- **User allergen profile** (planned in `CLAUDE.md` §8). Persist custom allergens and extend `allergenService` beyond Milk, Egg and Wheat.
-
-### P3: Polish and presentation
-- ESLint + Prettier in CI, a coverage badge, and either implemented or deleted skipped stubs.
-- README rewrite: hero GIF, live demo link, architecture diagram, a "Design decisions" section, and an eval results table.
-- Clean git: untrack `temp/` and `.idea/`, then add both to `.gitignore`. Check with Dan before deleting the screenshots, because they may be wanted for the README.
-- `docs/adr/` with 3 or 4 short ADRs (no traffic lights, on-device OCR, key proxy, structured output).
+| # | Milestone | Definition of done | Goals |
+|---|---|---|---|
+| **M1** | **Go public safely** | `temp/` and `.idea/` are no longer tracked and are in `.gitignore`. `.claude/settings.local.json` is no longer tracked. ESLint and Prettier run in CI. All 74 skipped stubs are implemented or deleted, so there are 0 skipped tests. A gitleaks scan of the full history is clean. "Not medical advice" copy is in the app and the README. `.cursor/rules` facts are refreshed. CI is green with a badge. *Owner action:* rotate the Gemini key and make the repo public. | G2, G7 |
+| **M2** | **Contract + serverless back end** | `shared/contract` v1 exists, with contract tests on both sides. The Azure Function `/analyze` is deployed by GitHub Actions (OIDC sign-in, Bicep, consumption plan). A CI check fails if the app bundle contains a key. `EXPO_PUBLIC_GEMINI_API_KEY` is removed. Gemini uses `responseSchema`. Results join by token, with a regression test for the position bug at `geminiService.ts:100`. Timeout, one retry, and a `degraded` flag shown as a calm notice in the palette's colours. | G4, G3 |
+| **M3** | **Evals in CI** | At least 40 golden labels (food, cosmetic, household, OCR-noisy text, French/Latin INCI, labels with marketing text mixed in). The replay tier runs on every PR. The live tier blocks prompt changes. Prompts are versioned in `shared/prompts`. The planted-fault table is published. A demonstration PR with a deliberate prompt regression fails CI (keep it as evidence). | G3 |
+| **M4** | **Mobile craft** | Results are cached so repeat scans work offline (key: token + prompt version). Camera permission states are handled: denied, limited, re-request. Scan-to-result time and startup time are measured on a low-end Android emulator profile and recorded in the README. Maestro flows run on an Android emulator in CI, driven by fixture images. | G5, G1 |
+| **M5** | **Responsibility, accessibility, metrics** | A confidence indicator on each card. Sources come from the curated table. A user allergen profile is persisted (`CLAUDE.md` §8). Screen-reader labels and dynamic type work. A unit test confirms every `STATUS_COLOR` pair meets a 4.5:1 contrast ratio. Sentry (free tier). Funnel events (scan → OCR → analysis → card expanded) and per-scan cost and latency go to App Insights, with a dashboard screenshot in the README. | G6, G7 |
+| **M6** | **Ship (free)** | EAS preview APK built from CI and linked in the README. The web demo (replayed responses, sample labels, no key) is deployed to GitHub Pages. The README is complete (outline below). ADRs are in `docs/adr/`. Changelog and a GitHub release are done. | G1, G2 |
 
 ---
+
+## README outline (target for M6; start the skeleton in M1)
+
+1. **Hero:** a one-line pitch, a scan → explanation GIF, badges (CI, evals, coverage, license), links to the **web demo** and the **APK**.
+2. **Why it exists:** label jargon as the problem. It educates rather than alarms (the research palette, no traffic lights).
+3. **How it works:** the architecture diagram, and what runs on the device versus in the cloud (the image never leaves the phone).
+4. **Testing the AI:** golden-set size, the latest scores, the planted-fault table, a link to the full report.
+5. **Engineering practices:** versioned contract, CI gates, E2E tests, offline cache, telemetry, how secrets are handled.
+6. **Responsible health information:** disclaimer, confidence, sources, allergen profile, accessibility.
+7. **Performance and cost:** p95 latency, cost per scan, low-end device numbers.
+8. **Design decisions:** ADR links (no traffic lights, OCR on the device, a key proxy, structured output plus evals, Azure Functions).
+9. **Run it locally:** app, function, evals.
+10. **Roadmap and changelog.**
+11. **About the author:** a short, generic narrative ("reliability-first engineering from regulated finance, applied to AI and mobile"). No employer names.
+
+---
+
+## Baseline (verified 2026-11-15)
+
+- `npm ci` is clean on Node 22. `npm run typecheck` reports 0 errors. `npm test` gives 196 passed and 74 skipped.
+- CI is in `.github/workflows/ci.yml` (typecheck + jest).
+- Known bugs to fix in M2:
+  - `analyzeWithGemini` swallows every error with `catch {}`.
+  - Results join by position (`ingredients[i]`), but the model drops non-ingredient tokens, so results get paired with the wrong ingredient.
+  - `JSON.parse` runs on free text, with no response schema.
 
 ## Working agreements
 
-- Branch: `ccr-da48948f-e0dz4i`. Don't open PRs unless Dan asks.
+- Work on branch `ccr-da48948f-e0dz4i`. Don't open PRs unless the owner asks.
 - Runtime deps go through `npx expo install`. Never bump `react-native` separately from the Expo SDK. Keep `react-test-renderer` pinned exactly to `react`.
-- Run `npm run verify` before every commit.
-- Follow the Theme/motion constraints and the status → `STATUS_COLOR` mapping in `CLAUDE.md`.
-- Keep `CLAUDE.md` accurate as things change. A stale guide is itself a negative signal.
+- Run `npm run verify` before every commit, and keep CI green.
+- Follow the Theme/motion rules and the `STATUS_COLOR` mapping (`CLAUDE.md` §2).
+- Keep `CLAUDE.md` accurate in the same commit as any change it describes.
+- At the end of each milestone, report: the definition of done met item by item (with evidence), what slipped, and which owner actions are needed.
 
-## Open questions for Dan
-1. What roles are you targeting (mobile, full-stack, AI/ML product engineer)? The answer changes whether P1 or P2 comes first.
-2. Is a small hosted backend OK (free-tier Cloudflare/Vercel), and whose account would it run on?
-3. Should the repo be public? If yes, rotate the existing Gemini key first, because it may already be in local bundles or builds.
-4. Do you want the `temp/` screenshots kept for the README?
+## Owner actions (things only the owner can do)
+
+- Before going public in M1: rotate the Gemini key, make the repo public, and enable GitHub Pages.
+- For M2: an Azure subscription (free tier), and an OIDC federated credential for GitHub Actions. Add `GEMINI_API_KEY` as a repo secret.
+- For M6: an Expo account (free) for EAS builds, with `EXPO_TOKEN` added as a repo secret.
