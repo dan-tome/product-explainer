@@ -24,14 +24,16 @@ const makeEdc = (): EDCMatch => ({
   regulation: 'Restricted in EU',
 });
 
-describe.skip('hasCompoundExposure', () => {
+describe('hasCompoundExposure', () => {
   it('returns false when ingredient has zero signals', () => {
     const ingredient = makeIngredient();
     expect(hasCompoundExposure(ingredient, null)).toBe(false);
   });
 
   it('returns false when only one signal is present (allergen only)', () => {
-    const ingredient = makeIngredient({ allergen_info: { is_match: true, alias_detected: 'Milk' } });
+    const ingredient = makeIngredient({
+      allergen_info: { is_match: true, alias_detected: 'Milk' },
+    });
     expect(hasCompoundExposure(ingredient, null)).toBe(false);
   });
 
@@ -64,7 +66,9 @@ describe.skip('hasCompoundExposure', () => {
   });
 
   it('returns true when allergen + EDC both present', () => {
-    const ingredient = makeIngredient({ allergen_info: { is_match: true, alias_detected: 'Wheat' } });
+    const ingredient = makeIngredient({
+      allergen_info: { is_match: true, alias_detected: 'Wheat' },
+    });
     expect(hasCompoundExposure(ingredient, makeEdc())).toBe(true);
   });
 

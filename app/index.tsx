@@ -43,21 +43,24 @@ export default function CameraScreen() {
     }
   }, [handoffVisible, isScanning, vfState]);
 
-  const onBarcodeScanned = useCallback((result: BarcodeScanningResult) => {
-    if (isScanning || handoffVisible) return;
-    const now = Date.now();
-    if (now - lastBarcodeAt.current < BARCODE_THROTTLE_MS) return;
-    lastBarcodeAt.current = now;
+  const onBarcodeScanned = useCallback(
+    (result: BarcodeScanningResult) => {
+      if (isScanning || handoffVisible) return;
+      const now = Date.now();
+      if (now - lastBarcodeAt.current < BARCODE_THROTTLE_MS) return;
+      lastBarcodeAt.current = now;
 
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    setTimeout(() => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }, 50);
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      setTimeout(() => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      }, 50);
 
-    setBarcodeBounds(result.bounds);
-    setGhostLabel(ghostLabelFromBarcodeData(result.data));
-    setVfState('barcode_lock');
-  }, [isScanning, handoffVisible]);
+      setBarcodeBounds(result.bounds);
+      setGhostLabel(ghostLabelFromBarcodeData(result.data));
+      setVfState('barcode_lock');
+    },
+    [isScanning, handoffVisible],
+  );
 
   useEffect(() => {
     if (vfState !== 'barcode_lock') return;
@@ -125,7 +128,7 @@ export default function CameraScreen() {
   if (isGranted === null) {
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="large" />
+        <ActivityIndicator size="large" testID="activity-indicator" />
       </View>
     );
   }
@@ -209,13 +212,23 @@ export default function CameraScreen() {
             <View style={styles.scanAreaPlaceholder} />
           </View>
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.iconButton} onPress={toggleCameraFacing}>
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={toggleCameraFacing}
+              testID="flip-button"
+              accessibilityRole="button"
+              accessibilityLabel="Flip camera"
+            >
               <FlipIcon size={30} color="white" />
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.captureButton, isScanning && styles.disabledButton]}
               onPress={takePicture}
               disabled={isScanning}
+              testID="capture-button"
+              accessibilityRole="button"
+              accessibilityLabel="Scan ingredient label"
+              accessibilityState={{ disabled: isScanning, busy: isScanning }}
             >
               {isScanning ? (
                 <ActivityIndicator color="white" />

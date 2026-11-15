@@ -4,8 +4,7 @@ import { EDC_ENTRIES } from './edcData';
  * Instant micro-literacy labels for the viewfinder Ghost Pill (barcode path).
  * Extend GTIN_MAP with your Open Food Facts / internal catalog joins.
  */
-const PARABEN_MICRO =
-  EDC_ENTRIES.find(e => e.family === 'Paraben')?.family ?? 'Paraben';
+const PARABEN_MICRO = EDC_ENTRIES.find(e => e.family === 'Paraben')?.family ?? 'Paraben';
 
 /** Exact GTIN / UPC strings (digits only) → display line for Ghost Pill */
 export const GTIN_MICRO_LABELS: Record<string, string> = {

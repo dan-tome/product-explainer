@@ -1,14 +1,24 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
 
 jest.mock('react-native-svg', () => {
   const React = require('react');
   const { View } = require('react-native');
-  const Stub = ({ children }: { children?: React.ReactNode }) => React.createElement(View, {}, children);
+  const Stub = ({ children }: { children?: React.ReactNode }) =>
+    React.createElement(View, {}, children);
+  const Svg = ({
+    children,
+    width,
+    height,
+  }: {
+    children?: React.ReactNode;
+    width: number;
+    height: number;
+  }) => React.createElement(View, { testID: 'hairline-svg', width, height }, children);
   return {
     __esModule: true,
-    default: Stub,
-    Svg: Stub,
+    default: Svg,
+    Svg,
     Defs: Stub,
     LinearGradient: Stub,
     Rect: Stub,
@@ -25,18 +35,16 @@ const makeNote = (overrides: Partial<NoteModel> = {}): NoteModel => ({
   ...overrides,
 });
 
-describe.skip('CumulativeResearchNote', () => {
-  it('renders without crashing', () => {
-    render(<CumulativeResearchNote note={makeNote()} />);
-  });
-
+describe('CumulativeResearchNote', () => {
   it('shows the "Aggregate signal" kicker', () => {
     render(<CumulativeResearchNote note={makeNote()} />);
     expect(screen.getByText('Aggregate signal')).toBeTruthy();
   });
 
   it('renders the note title', () => {
-    render(<CumulativeResearchNote note={makeNote({ title: 'Thyroid + estrogen pathways active' })} />);
+    render(
+      <CumulativeResearchNote note={makeNote({ title: 'Thyroid + estrogen pathways active' })} />,
+    );
     expect(screen.getByText('Thyroid + estrogen pathways active')).toBeTruthy();
   });
 
@@ -52,7 +60,9 @@ describe.skip('CumulativeResearchNote', () => {
   });
 
   it('updates displayed text when the note prop changes', () => {
-    const { rerender } = render(<CumulativeResearchNote note={makeNote({ title: 'First title' })} />);
+    const { rerender } = render(
+      <CumulativeResearchNote note={makeNote({ title: 'First title' })} />,
+    );
     expect(screen.getByText('First title')).toBeTruthy();
 
     rerender(<CumulativeResearchNote note={makeNote({ title: 'Updated title' })} />);
@@ -60,14 +70,17 @@ describe.skip('CumulativeResearchNote', () => {
   });
 
   it('does not render the SVG border before layout fires (zero size guard)', () => {
-    // Component guards on size.w > 0 && size.h > 0 before rendering SVG
-    // At initial render (no layout event), SVG should be absent
     render(<CumulativeResearchNote note={makeNote()} />);
-    // TODO: assert SVG mock is not present in tree at initial render
+    expect(screen.queryByTestId('hairline-svg')).toBeNull();
   });
 
   it('renders the SVG border after layout provides real dimensions', () => {
-    // TODO: fire onLayout with { nativeEvent: { layout: { width: 300, height: 100 } } }
-    // and assert the SVG Rect is present
+    render(<CumulativeResearchNote note={makeNote()} />);
+    fireEvent(screen.getByText(makeNote().title), 'layout', {
+      nativeEvent: { layout: { x: 0, y: 0, width: 300, height: 100 } },
+    });
+    const svg = screen.getByTestId('hairline-svg');
+    expect(svg.props.width).toBe(300);
+    expect(svg.props.height).toBe(100);
   });
 });

@@ -52,19 +52,56 @@ describe('detectAllergens', () => {
 describe('Performance Audit — O(1) allergen engine', () => {
   // Realistic 50-item INCI list mixing known allergens and non-allergens
   const INCI_50 = [
-    'aqua', 'glycerin', 'sodium laureth sulfate', 'cocamidopropyl betaine',
-    'sodium chloride', 'caseinate', 'citric acid', 'phenoxyethanol',
-    'parfum', 'gluten', 'polysorbate 80', 'xanthan gum',
-    'tocopherol', 'retinol', 'niacinamide', 'hyaluronic acid',
-    'albumin', 'salicylic acid', 'lactic acid', 'zinc oxide',
-    'titanium dioxide', 'iron oxides', 'mica', 'talc',
-    'dimethicone', 'cyclomethicone', 'butylene glycol', 'propylene glycol',
-    'carbomer', 'triethanolamine', 'disodium edta', 'sodium benzoate',
-    'potassium sorbate', 'methylparaben', 'ethylparaben', 'benzyl alcohol',
-    'whey protein', 'magnesium stearate', 'silicon dioxide', 'maltodextrin',
-    'sunflower oil', 'shea butter', 'coconut oil', 'jojoba oil',
-    'aloe vera', 'green tea extract', 'vitamin e', 'coenzyme q10',
-    'ceramide', 'cholesterol',
+    'aqua',
+    'glycerin',
+    'sodium laureth sulfate',
+    'cocamidopropyl betaine',
+    'sodium chloride',
+    'caseinate',
+    'citric acid',
+    'phenoxyethanol',
+    'parfum',
+    'gluten',
+    'polysorbate 80',
+    'xanthan gum',
+    'tocopherol',
+    'retinol',
+    'niacinamide',
+    'hyaluronic acid',
+    'albumin',
+    'salicylic acid',
+    'lactic acid',
+    'zinc oxide',
+    'titanium dioxide',
+    'iron oxides',
+    'mica',
+    'talc',
+    'dimethicone',
+    'cyclomethicone',
+    'butylene glycol',
+    'propylene glycol',
+    'carbomer',
+    'triethanolamine',
+    'disodium edta',
+    'sodium benzoate',
+    'potassium sorbate',
+    'methylparaben',
+    'ethylparaben',
+    'benzyl alcohol',
+    'whey protein',
+    'magnesium stearate',
+    'silicon dioxide',
+    'maltodextrin',
+    'sunflower oil',
+    'shea butter',
+    'coconut oil',
+    'jojoba oil',
+    'aloe vera',
+    'green tea extract',
+    'vitamin e',
+    'coenzyme q10',
+    'ceramide',
+    'cholesterol',
   ];
 
   it('processes a 50-item INCI list in under 200ms (O(1) Map lookup per item)', () => {
@@ -77,8 +114,8 @@ describe('Performance Audit — O(1) allergen engine', () => {
   it('correctly identifies allergens within the 50-item list', () => {
     const matches = detectAllergens(INCI_50);
     const allergens = matches.map(m => m.allergen);
-    expect(allergens).toContain('Milk');  // caseinate, whey protein
+    expect(allergens).toContain('Milk'); // caseinate, whey protein
     expect(allergens).toContain('Wheat'); // gluten
-    expect(allergens).toContain('Egg');   // albumin
+    expect(allergens).toContain('Egg'); // albumin
   });
 });

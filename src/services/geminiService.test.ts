@@ -31,18 +31,21 @@ describe('analyzeWithGemini', () => {
     expect(prompt).toContain('Sugar');
   });
 
-  const fullIngredientJSON = (overrides = {}) => JSON.stringify([{
-    scientific_name: 'Solanum tuberosum',
-    common_name: 'Potato',
-    functional_purpose: 'Provides sustained energy - Carbohydrate source',
-    regulatory_context: 'Natural food ingredient, no restrictions.',
-    exposure_context: 'Safe for intended use.',
-    science_note: 'A starchy tuber rich in complex carbohydrates.',
-    literacy_flag: 'Potatoes are the world\'s fourth-largest food crop.',
-    risk_family: null,
-    status: 'safe',
-    ...overrides,
-  }]);
+  const fullIngredientJSON = (overrides = {}) =>
+    JSON.stringify([
+      {
+        scientific_name: 'Solanum tuberosum',
+        common_name: 'Potato',
+        functional_purpose: 'Provides sustained energy - Carbohydrate source',
+        regulatory_context: 'Natural food ingredient, no restrictions.',
+        exposure_context: 'Safe for intended use.',
+        science_note: 'A starchy tuber rich in complex carbohydrates.',
+        literacy_flag: "Potatoes are the world's fourth-largest food crop.",
+        risk_family: null,
+        status: 'safe',
+        ...overrides,
+      },
+    ]);
 
   it('returns parsed Ingredient array from Gemini JSON', async () => {
     mockGenerateContent.mockResolvedValue({ response: { text: () => fullIngredientJSON() } });
@@ -73,17 +76,20 @@ describe('analyzeWithGemini', () => {
   it('corrects OCR errors via Gemini response common_name field', async () => {
     mockGenerateContent.mockResolvedValue({
       response: {
-        text: () => JSON.stringify([{
-          scientific_name: 'Carum petroselinum',
-          common_name: 'Powdered dried parsley',
-          functional_purpose: 'Adds herbal flavour - Flavouring',
-          regulatory_context: 'Natural herb, no restrictions.',
-          exposure_context: 'Safe for intended use.',
-          science_note: 'Rich in volatile oils that provide characteristic flavour.',
-          literacy_flag: '',
-          risk_family: null,
-          status: 'safe',
-        }]),
+        text: () =>
+          JSON.stringify([
+            {
+              scientific_name: 'Carum petroselinum',
+              common_name: 'Powdered dried parsley',
+              functional_purpose: 'Adds herbal flavour - Flavouring',
+              regulatory_context: 'Natural herb, no restrictions.',
+              exposure_context: 'Safe for intended use.',
+              science_note: 'Rich in volatile oils that provide characteristic flavour.',
+              literacy_flag: '',
+              risk_family: null,
+              status: 'safe',
+            },
+          ]),
       },
     });
     const result = await analyzeWithGemini(['Pewde dried parsely']);

@@ -19,12 +19,15 @@ Example (Sodium Hydroxide in a cosmetic/food context):
 
 const CONTEXT_BY_TYPE: Record<ProductType, string> = {
   FOOD: 'For food ingredients, frame functional_purpose and science_note around taste, nutrition, texture, or shelf-life benefit.',
-  COSMETIC: 'For cosmetic ingredients, frame functional_purpose and science_note around skin feel, appearance, or hair benefit.',
-  HOUSEHOLD: 'For household ingredients, frame functional_purpose and science_note around cleaning performance or user safety.',
+  COSMETIC:
+    'For cosmetic ingredients, frame functional_purpose and science_note around skin feel, appearance, or hair benefit.',
+  HOUSEHOLD:
+    'For household ingredients, frame functional_purpose and science_note around cleaning performance or user safety.',
   UNKNOWN: 'Frame functional_purpose and science_note in plain, benefit-first language.',
 };
 
-const buildPrompt = (productType: ProductType): string => `
+const buildPrompt = (productType: ProductType): string =>
+  `
 You are a product ingredient analyst. You will receive OCR-extracted tokens from a ${productType.toLowerCase()} product label — they may contain OCR errors.
 
 ${ONE_SHOT_EXAMPLE}
@@ -96,7 +99,9 @@ export const analyzeWithGemini = async (
   const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
   try {
-    const result = await model.generateContent(buildPrompt(productType) + '\n' + ingredients.join('\n'));
+    const result = await model.generateContent(
+      buildPrompt(productType) + '\n' + ingredients.join('\n'),
+    );
     const parsed: GeminiRaw[] = JSON.parse(result.response.text());
     return parsed.map((raw, i) => toIngredient(raw, ingredients[i] ?? ''));
   } catch {

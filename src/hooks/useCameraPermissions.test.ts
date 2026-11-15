@@ -9,7 +9,7 @@ import { useCameraPermissions } from './useCameraPermissions';
 
 const mockUseCameraPermissions = useExpoCameraPermissions as jest.Mock;
 
-describe.skip('useCameraPermissions', () => {
+describe('useCameraPermissions', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -38,35 +38,29 @@ describe.skip('useCameraPermissions', () => {
   });
 
   it('returns isGranted=true when permission is granted', () => {
-    mockUseCameraPermissions.mockReturnValue([
-      { granted: true, canAskAgain: false },
-      jest.fn(),
-    ]);
+    mockUseCameraPermissions.mockReturnValue([{ granted: true, canAskAgain: false }, jest.fn()]);
     const { result } = renderHook(() => useCameraPermissions());
     expect(result.current.isGranted).toBe(true);
   });
 
   it('returns isGranted=false when permission is denied', () => {
-    mockUseCameraPermissions.mockReturnValue([
-      { granted: false, canAskAgain: true },
-      jest.fn(),
-    ]);
+    mockUseCameraPermissions.mockReturnValue([{ granted: false, canAskAgain: true }, jest.fn()]);
     const { result } = renderHook(() => useCameraPermissions());
     expect(result.current.isGranted).toBe(false);
   });
 
   it('returns canAskAgain from the permission object', () => {
-    mockUseCameraPermissions.mockReturnValue([
-      { granted: false, canAskAgain: true },
-      jest.fn(),
-    ]);
+    mockUseCameraPermissions.mockReturnValue([{ granted: false, canAskAgain: true }, jest.fn()]);
     const { result } = renderHook(() => useCameraPermissions());
     expect(result.current.canAskAgain).toBe(true);
   });
 
   it('exposes requestPermission so callers can trigger it manually', () => {
     const requestPermission = jest.fn().mockResolvedValue({ granted: true });
-    mockUseCameraPermissions.mockReturnValue([{ granted: false, canAskAgain: true }, requestPermission]);
+    mockUseCameraPermissions.mockReturnValue([
+      { granted: false, canAskAgain: true },
+      requestPermission,
+    ]);
     const { result } = renderHook(() => useCameraPermissions());
     act(() => {
       result.current.requestPermission();

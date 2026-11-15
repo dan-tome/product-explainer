@@ -19,15 +19,7 @@ jest.mock('react-native-svg', () => {
 
 import { TransparencySandwich, MagnifyingGlassSvg, VentilationSvg } from './TransparencySandwich';
 
-describe.skip('TransparencySandwich', () => {
-  it('renders without crashing with showVentilation=false', () => {
-    render(
-      <TransparencySandwich showVentilation={false}>
-        <Text>Content</Text>
-      </TransparencySandwich>,
-    );
-  });
-
+describe('TransparencySandwich', () => {
   it('renders children in the center slot', () => {
     render(
       <TransparencySandwich showVentilation={false}>
@@ -65,22 +57,14 @@ describe.skip('TransparencySandwich', () => {
   });
 });
 
-describe.skip('MagnifyingGlassSvg', () => {
-  it('renders without crashing', () => {
-    render(<MagnifyingGlassSvg />);
-  });
-
+describe('MagnifyingGlassSvg', () => {
   it('has the scientific scrutiny accessibility label', () => {
     render(<MagnifyingGlassSvg />);
     expect(screen.getByLabelText('Scientific scrutiny')).toBeTruthy();
   });
 });
 
-describe.skip('VentilationSvg', () => {
-  it('renders without crashing', () => {
-    render(<VentilationSvg />);
-  });
-
+describe('VentilationSvg', () => {
   it('has the ventilation advisory accessibility label', () => {
     render(<VentilationSvg />);
     expect(screen.getByLabelText('Ventilation advisory')).toBeTruthy();

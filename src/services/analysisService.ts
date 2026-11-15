@@ -45,7 +45,8 @@ export const analyzeIngredients = async (text: string): Promise<Ingredient[]> =>
   const geminiResults = await analyzeWithGemini(tokens, productType);
 
   return geminiResults.map(ingredient => {
-    const allergenMatch = checkAllergen(ingredient.scientific_name) ?? checkAllergen(ingredient.common_name);
+    const allergenMatch =
+      checkAllergen(ingredient.scientific_name) ?? checkAllergen(ingredient.common_name);
     return {
       ...ingredient,
       allergen_info: {

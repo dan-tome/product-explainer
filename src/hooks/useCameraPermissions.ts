@@ -8,7 +8,7 @@ export function useCameraPermissions() {
     if (!permission) {
       requestPermission();
     }
-  }, [permission]);
+  }, [permission, requestPermission]);
 
   return {
     isGranted: permission ? permission.granted : null,

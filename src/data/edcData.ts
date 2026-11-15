@@ -38,13 +38,15 @@ export const EDC_ENTRIES: EDCEntry[] = [
     aliases: ['propylparaben'],
     family: 'Paraben',
     concern: 'Potential endocrine disruptor — paraben family (EFSA 2023 review)',
-    regulation: 'EFSA 2023: re-evaluated; safe at authorised levels in food. Restricted in cosmetics for infants <3.',
+    regulation:
+      'EFSA 2023: re-evaluated; safe at authorised levels in food. Restricted in cosmetics for infants <3.',
   },
   {
     aliases: ['butylparaben'],
     family: 'Paraben',
     concern: 'Potential endocrine disruptor — paraben family (EFSA 2023 review)',
-    regulation: 'EFSA 2023: re-evaluated; safe at authorised levels in food. Restricted in cosmetics for infants <3.',
+    regulation:
+      'EFSA 2023: re-evaluated; safe at authorised levels in food. Restricted in cosmetics for infants <3.',
   },
   {
     aliases: ['isobutylparaben'],
@@ -58,19 +60,22 @@ export const EDC_ENTRIES: EDCEntry[] = [
     aliases: ['oxybenzone', 'benzophenone-3'],
     family: 'UV Filter',
     concern: 'Potential endocrine disruptor — oestrogenic activity reported in vitro',
-    regulation: 'ECHA SVHC candidate (2024). Restricted in EU to ≤2.2% in cosmetics. Hawaii/Palau reef-protection ban.',
+    regulation:
+      'ECHA SVHC candidate (2024). Restricted in EU to ≤2.2% in cosmetics. Hawaii/Palau reef-protection ban.',
   },
   {
     aliases: ['homosalate'],
     family: 'UV Filter',
     concern: 'Potential endocrine disruptor — UV filter under EFSA re-evaluation',
-    regulation: 'EFSA under review 2024. EU max concentration lowered to 0.5% (Commission Reg. 2021/1099).',
+    regulation:
+      'EFSA under review 2024. EU max concentration lowered to 0.5% (Commission Reg. 2021/1099).',
   },
   {
     aliases: ['octinoxate', 'ethylhexyl methoxycinnamate'],
     family: 'UV Filter',
     concern: 'Potential endocrine disruptor — thyroid and oestrogen receptor activity',
-    regulation: 'Permitted in EU at ≤7.5%. Marine ecosystem concern; banned in several reef-protection jurisdictions.',
+    regulation:
+      'Permitted in EU at ≤7.5%. Marine ecosystem concern; banned in several reef-protection jurisdictions.',
   },
   {
     aliases: ['4-methylbenzylidene camphor', '4-mbc'],
@@ -83,8 +88,10 @@ export const EDC_ENTRIES: EDCEntry[] = [
   {
     aliases: ['triclosan'],
     family: 'Antimicrobial',
-    concern: 'Potential endocrine disruptor — thyroid hormone disruption; antimicrobial resistance concern',
-    regulation: 'Banned from EU cosmetics (2017). FDA 2016 OTC monograph ban in US rinse-off products. ECHA SVHC.',
+    concern:
+      'Potential endocrine disruptor — thyroid hormone disruption; antimicrobial resistance concern',
+    regulation:
+      'Banned from EU cosmetics (2017). FDA 2016 OTC monograph ban in US rinse-off products. ECHA SVHC.',
   },
   {
     aliases: ['triclocarban'],
@@ -98,7 +105,8 @@ export const EDC_ENTRIES: EDCEntry[] = [
     aliases: ['bha', 'butylated hydroxyanisole'],
     family: 'Antioxidant',
     concern: 'Potential endocrine disruptor — IARC Group 2B (possibly carcinogenic to humans)',
-    regulation: 'Permitted in EU food at restricted levels (E320). EFSA under review. Some national cosmetics restrictions.',
+    regulation:
+      'Permitted in EU food at restricted levels (E320). EFSA under review. Some national cosmetics restrictions.',
   },
   {
     aliases: ['bht', 'butylated hydroxytoluene'],
@@ -118,7 +126,8 @@ export const EDC_ENTRIES: EDCEntry[] = [
     aliases: ['cyclopentasiloxane', 'd5'],
     family: 'Cyclosiloxane',
     concern: 'Under regulatory review — environmental persistence and bioaccumulation concern',
-    regulation: 'EU REACH restriction under evaluation. Restricted in wash-off cosmetics ≤0.1% (Reg. 2018/35).',
+    regulation:
+      'EU REACH restriction under evaluation. Restricted in wash-off cosmetics ≤0.1% (Reg. 2018/35).',
   },
   {
     aliases: ['cyclohexasiloxane', 'd6'],
@@ -152,8 +161,10 @@ export const EDC_ENTRIES: EDCEntry[] = [
     // Validated by Toxicology Lead (2026-04-21 transmission)
     aliases: ['bisphenol a', 'bpa', "4,4'-isopropylidenediphenol"],
     family: 'Bisphenol',
-    concern: 'Potential endocrine disruptor — mimics oestrogen; linked to reproductive, metabolic, and developmental effects',
-    regulation: 'EU: banned in polycarbonate baby bottles (2011) and food-contact materials for infants (2018). ECHA SVHC. FDA under review.',
+    concern:
+      'Potential endocrine disruptor — mimics oestrogen; linked to reproductive, metabolic, and developmental effects',
+    regulation:
+      'EU: banned in polycarbonate baby bottles (2011) and food-contact materials for infants (2018). ECHA SVHC. FDA under review.',
   },
 
   // ── Other ─────────────────────────────────────────────────────────────────

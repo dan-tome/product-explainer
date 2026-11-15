@@ -37,10 +37,10 @@ const PulseCard = ({
 
 export const ProductPulse: React.FC<Props> = ({ ingredients, productType }) => {
   const allergenCount = ingredients.filter(i => i.allergen_info.is_match).length;
-  const allergenValue = allergenCount === 0 ? 'No Matches' : `${allergenCount} Match${allergenCount > 1 ? 'es' : ''}`;
-  const allergenSub = allergenCount === 0
-    ? 'No known allergens detected'
-    : `of ${ingredients.length} ingredients`;
+  const allergenValue =
+    allergenCount === 0 ? 'No Matches' : `${allergenCount} Match${allergenCount > 1 ? 'es' : ''}`;
+  const allergenSub =
+    allergenCount === 0 ? 'No known allergens detected' : `of ${ingredients.length} ingredients`;
 
   // Insight card: functional_purpose of the first (primary) ingredient
   const primaryIngredient = ingredients[0];

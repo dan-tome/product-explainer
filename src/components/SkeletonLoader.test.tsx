@@ -1,11 +1,13 @@
 import React from 'react';
-import { render } from '@testing-library/react-native';
+import { render, screen } from '@testing-library/react-native';
 
 jest.mock('react-native', () => {
   const RN = jest.requireActual('react-native');
   const animResult = { finished: true };
   RN.Animated.timing = () => ({ start: (cb?: (r: typeof animResult) => void) => cb?.(animResult) });
-  RN.Animated.sequence = () => ({ start: (cb?: (r: typeof animResult) => void) => cb?.(animResult) });
+  RN.Animated.sequence = () => ({
+    start: (cb?: (r: typeof animResult) => void) => cb?.(animResult),
+  });
   RN.Animated.loop = () => ({ start: jest.fn() });
   return RN;
 });
@@ -18,9 +20,21 @@ describe('SkeletonLoader', () => {
   });
 
   it('renders three pulse cards (hero + two standard)', () => {
-    const { getAllByTestId } = render(<SkeletonLoader />);
-    // SkeletonLoader renders pulse cards and ingredient cards — verify structure
-    // by confirming the component tree mounts cleanly
-    expect(true).toBe(true);
+    render(<SkeletonLoader />);
+    expect(
+      screen.getAllByTestId('skeleton-pulse-card', { includeHiddenElements: true }),
+    ).toHaveLength(3);
+  });
+
+  it('renders six placeholder ingredient cards', () => {
+    render(<SkeletonLoader />);
+    expect(
+      screen.getAllByTestId('skeleton-ingredient-card', { includeHiddenElements: true }),
+    ).toHaveLength(6);
+  });
+
+  it('announces loading to screen readers', () => {
+    render(<SkeletonLoader />);
+    expect(screen.getByLabelText('Analysing ingredients')).toBeTruthy();
   });
 });

@@ -3,9 +3,7 @@ import type { BarcodeBounds } from 'expo-camera';
 import type { BarcodeBoundsInput } from '../components/CameraOverlay';
 
 // Bundled fixtures (same pattern as packaged app assets in app.json).
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 const testBarcodeWipes = require('../../assets/test-barcode-wipes.png');
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 const testIngredientsOcr = require('../../assets/test-ingredients-ocr.png');
 
 export function getTestBarcodeWipesAssetUri(): string {

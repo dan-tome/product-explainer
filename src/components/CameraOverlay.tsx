@@ -1,6 +1,12 @@
 import React, { useEffect, useId, useMemo, useRef } from 'react';
 import { Animated, LayoutChangeEvent, StyleSheet, Text, View, ViewStyle } from 'react-native';
-import Svg, { Defs, RadialGradient, Rect, Stop, LinearGradient as SvgLinearGradient } from 'react-native-svg';
+import Svg, {
+  Defs,
+  RadialGradient,
+  Rect,
+  Stop,
+  LinearGradient as SvgLinearGradient,
+} from 'react-native-svg';
 import { RESEARCH_PALETTE } from '../styles/Theme';
 import { MOTION } from '../styles/motion';
 import type { ViewfinderState } from '../types/viewfinder';
@@ -47,7 +53,8 @@ export const CameraOverlay: React.FC<Props> = ({
   const vid = useId().replace(/[^a-zA-Z0-9_-]/g, '');
 
   const center = useMemo(() => {
-    if (!barcodeBounds || layoutW <= 0 || layoutH <= 0) return { cx: layoutW * 0.5, cy: layoutH * 0.5, r: Math.min(layoutW, layoutH) * 0.35 };
+    if (!barcodeBounds || layoutW <= 0 || layoutH <= 0)
+      return { cx: layoutW * 0.5, cy: layoutH * 0.5, r: Math.min(layoutW, layoutH) * 0.35 };
     const { origin, size } = barcodeBounds;
     const cx = origin.x + size.width / 2;
     const cy = origin.y + size.height / 2;
@@ -150,7 +157,13 @@ export const CameraOverlay: React.FC<Props> = ({
         <Animated.View style={[StyleSheet.absoluteFill, { opacity: vignetteOpacity }]}>
           <Svg width={layoutW} height={layoutH}>
             <Defs>
-              <RadialGradient id={vid} cx={`${(center.cx / layoutW) * 100}%`} cy={`${(center.cy / layoutH) * 100}%`} rx="55%" ry="55%">
+              <RadialGradient
+                id={vid}
+                cx={`${(center.cx / layoutW) * 100}%`}
+                cy={`${(center.cy / layoutH) * 100}%`}
+                rx="55%"
+                ry="55%"
+              >
                 <Stop offset="0%" stopColor="rgba(15,23,42,0)" />
                 <Stop offset="55%" stopColor="rgba(15,23,42,0.25)" />
                 <Stop offset="100%" stopColor="rgba(15,23,42,0.58)" />
@@ -192,7 +205,12 @@ export const CameraOverlay: React.FC<Props> = ({
 
       {/* OCR synthesis: soft purple underline */}
       {state === 'ocr_synthesis' && (
-        <View style={[styles.ocrWrap, { top: passiveTop + passiveH - 4, left: passiveLeft, width: passiveW }]}>
+        <View
+          style={[
+            styles.ocrWrap,
+            { top: passiveTop + passiveH - 4, left: passiveLeft, width: passiveW },
+          ]}
+        >
           <Animated.View
             style={[
               styles.ocrLine,
@@ -208,7 +226,12 @@ export const CameraOverlay: React.FC<Props> = ({
 
       {/* Ghost pill */}
       {showGhost && ghostLabel ? (
-        <Animated.View style={[styles.ghostPill, { left: Math.max(8, pillLeft), top: pillTop, transform: [{ translateY: pillY }] }]}>
+        <Animated.View
+          style={[
+            styles.ghostPill,
+            { left: Math.max(8, pillLeft), top: pillTop, transform: [{ translateY: pillY }] },
+          ]}
+        >
           <Text style={styles.ghostText} numberOfLines={2}>
             {ghostLabel}
           </Text>

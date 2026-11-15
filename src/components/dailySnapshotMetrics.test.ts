@@ -42,7 +42,10 @@ describe('buildSegments — tone thresholds', () => {
 
   it('returns "shifting" tone when all ingredients are avoid + allergen match (weight ~4.0)', () => {
     const ingredients = Array.from({ length: 5 }, () =>
-      makeIngredient({ status: 'avoid', allergen_info: { is_match: true, alias_detected: 'Milk' } }),
+      makeIngredient({
+        status: 'avoid',
+        allergen_info: { is_match: true, alias_detected: 'Milk' },
+      }),
     );
     const { tone } = buildSegments(ingredients);
     expect(tone).toBe('shifting');
@@ -95,10 +98,7 @@ describe('buildSegments — summary lines', () => {
   });
 
   it('reports "closer look" when warning/avoid items are present', () => {
-    const ingredients = [
-      makeIngredient({ status: 'warning' }),
-      makeIngredient({ status: 'safe' }),
-    ];
+    const ingredients = [makeIngredient({ status: 'warning' }), makeIngredient({ status: 'safe' })];
     const { summaryLine } = buildSegments(ingredients);
     expect(summaryLine).toMatch(/closer look/i);
   });
@@ -107,7 +107,9 @@ describe('buildSegments — summary lines', () => {
 describe('buildSegments — segments', () => {
   it('always returns exactly 5 segments regardless of ingredient count', () => {
     expect(buildSegments([makeIngredient()]).segments).toHaveLength(5);
-    expect(buildSegments(Array.from({ length: 20 }, () => makeIngredient())).segments).toHaveLength(5);
+    expect(buildSegments(Array.from({ length: 20 }, () => makeIngredient())).segments).toHaveLength(
+      5,
+    );
   });
 
   it('each segment has a color string and label string', () => {

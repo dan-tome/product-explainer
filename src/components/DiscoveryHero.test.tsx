@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react-native';
+import { render, screen, within } from '@testing-library/react-native';
 
 jest.mock('lucide-react-native', () => {
   const React = require('react');
@@ -10,7 +10,7 @@ jest.mock('lucide-react-native', () => {
 
 import { DiscoveryHero } from './DiscoveryHero';
 
-describe.skip('DiscoveryHero', () => {
+describe('DiscoveryHero', () => {
   it('renders for UNKNOWN product type with ingredients present', () => {
     render(<DiscoveryHero productType="UNKNOWN" ingredientCount={3} />);
     expect(screen.getByText('First light on this label')).toBeTruthy();
@@ -44,8 +44,9 @@ describe.skip('DiscoveryHero', () => {
 
   it('has accessible role of text', () => {
     render(<DiscoveryHero productType="UNKNOWN" ingredientCount={2} />);
-    // accessibilityRole="text" is on the outer View
-    expect(screen.getByRole('text')).toBeTruthy();
+    // accessibilityRole="text" is on the outer View, so the whole hero reads as one unit
+    const wrapper = screen.getAllByRole('text')[0];
+    expect(within(wrapper).getByText('First light on this label')).toBeTruthy();
   });
 
   it('renders the sparkles icon', () => {

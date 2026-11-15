@@ -1,8 +1,22 @@
 import { ProductType } from '../types/product';
 
-const FOOD_ANCHORS = ['nutrition facts', 'calories', '% daily value', 'serving size', 'total fat', 'dietary fiber'];
+const FOOD_ANCHORS = [
+  'nutrition facts',
+  'calories',
+  '% daily value',
+  'serving size',
+  'total fat',
+  'dietary fiber',
+];
 const COSMETIC_ANCHORS = ['inci', 'apply to', 'skin', 'hair', 'rinse', 'lather', 'dermatologist'];
-const HOUSEHOLD_ANCHORS = ['surfactant', 'bleach', 'detergent', 'disinfectant', 'cleaning', 'solvent'];
+const HOUSEHOLD_ANCHORS = [
+  'surfactant',
+  'bleach',
+  'detergent',
+  'disinfectant',
+  'cleaning',
+  'solvent',
+];
 
 export const classifyProductText = (text: string): ProductType => {
   const normalized = text.toLowerCase();

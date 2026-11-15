@@ -12,12 +12,12 @@ export interface ScannedProduct {
 }
 
 export interface CompoundExposure {
-  key: string;           // scientific_name (lowercase) — stable deduplication key
+  key: string; // scientific_name (lowercase) — stable deduplication key
   commonName: string;
   family: 'EDC' | 'Allergen';
   concern: string;
-  occurrences: number;   // number of products in the routine containing this ingredient
-  products: string[];    // product labels for display
+  occurrences: number; // number of products in the routine containing this ingredient
+  products: string[]; // product labels for display
 }
 
 // productId → label, maintained per index entry.
@@ -43,10 +43,9 @@ const _index = new Map<string, IndexEntry>();
 
 // Serialises _products to AsyncStorage. Fire-and-forget — never blocks callers.
 const persist = (): void => {
-  AsyncStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify(Array.from(_products.entries())),
-  ).catch(() => {}); // non-fatal: in-memory state remains the source of truth
+  AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(_products.entries()))).catch(
+    () => {},
+  ); // non-fatal: in-memory state remains the source of truth
 };
 
 // ── Private helpers ───────────────────────────────────────────────────────────
@@ -79,14 +78,7 @@ const indexIngredients = (product: ScannedProduct): void => {
     // EDC check — O(1) Map lookup via checkEDC
     const edcMatch = checkEDC(ingredient.scientific_name) ?? checkEDC(ingredient.common_name);
     if (edcMatch !== null) {
-      upsertIndex(
-        key,
-        ingredient.common_name,
-        'EDC',
-        edcMatch.concern,
-        product.id,
-        product.label,
-      );
+      upsertIndex(key, ingredient.common_name, 'EDC', edcMatch.concern, product.id, product.label);
       continue; // EDC takes precedence; skip allergen check for same ingredient
     }
 
@@ -177,7 +169,8 @@ export const getRoutineSummary = () => ({
   totalProducts: _products.size,
   compoundExposures: getCompoundExposures(),
   edcCount: [..._index.values()].filter(e => e.family === 'EDC' && e.productMap.size >= 2).length,
-  allergenCount: [..._index.values()].filter(e => e.family === 'Allergen' && e.productMap.size >= 2).length,
+  allergenCount: [..._index.values()].filter(e => e.family === 'Allergen' && e.productMap.size >= 2)
+    .length,
 });
 
 /**

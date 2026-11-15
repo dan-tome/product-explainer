@@ -39,7 +39,9 @@ describe('universalBridgeResolve — synergy (Tier 2)', () => {
   });
 
   it('does not activate synergy with only one pathway', () => {
-    const ingredients: Ingredient[] = [{ ...base(), scientific_name: 'Oxybenzone', common_name: 'Oxybenzone' }];
+    const ingredients: Ingredient[] = [
+      { ...base(), scientific_name: 'Oxybenzone', common_name: 'Oxybenzone' },
+    ];
     expect(detectSynergy(ingredients)).toBe(false);
     const r = resolveAggregateBridge(ingredients);
     expect(r.synergyActive).toBe(false);

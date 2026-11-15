@@ -1,15 +1,25 @@
 import React from 'react';
 import { Text } from 'react-native';
-import { render, screen, fireEvent } from '@testing-library/react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
 
 jest.mock('react-native-svg', () => {
   const React = require('react');
   const { View } = require('react-native');
-  const Stub = ({ children }: { children?: React.ReactNode }) => React.createElement(View, {}, children);
+  const Stub = ({ children }: { children?: React.ReactNode }) =>
+    React.createElement(View, {}, children);
+  const Svg = ({
+    children,
+    width,
+    height,
+  }: {
+    children?: React.ReactNode;
+    width: number;
+    height: number;
+  }) => React.createElement(View, { testID: 'hairline-svg', width, height }, children);
   return {
     __esModule: true,
-    default: Stub,
-    Svg: Stub,
+    default: Svg,
+    Svg,
     Defs: Stub,
     LinearGradient: Stub,
     Rect: Stub,
@@ -19,15 +29,7 @@ jest.mock('react-native-svg', () => {
 
 import { CompoundGroupFrame } from './CompoundGroupFrame';
 
-describe.skip('CompoundGroupFrame', () => {
-  it('renders without crashing', () => {
-    render(
-      <CompoundGroupFrame>
-        <Text>Child</Text>
-      </CompoundGroupFrame>,
-    );
-  });
-
+describe('CompoundGroupFrame', () => {
   it('renders its children', () => {
     render(
       <CompoundGroupFrame>
@@ -38,25 +40,27 @@ describe.skip('CompoundGroupFrame', () => {
   });
 
   it('does not render the SVG border before a layout event (zero dimensions)', () => {
-    // Before onLayout fires, size is {w:0, h:0} — SVG should be absent
     render(
       <CompoundGroupFrame>
         <Text>Child</Text>
       </CompoundGroupFrame>,
     );
-    // Svg stub would produce a View; absence of the hairline rect means no SVG children at zero size
-    // This test documents the guard: `size.w > 0 && size.h > 0`
+    expect(screen.queryByTestId('hairline-svg')).toBeNull();
   });
 
-  it('renders the SVG border after a layout event provides real dimensions', () => {
-    const { getByTestId } = render(
+  it('renders the SVG border sized to the layout once dimensions are known', () => {
+    render(
       <CompoundGroupFrame>
         <Text>Child</Text>
       </CompoundGroupFrame>,
     );
-    // Fire onLayout to give the wrapping View real dimensions
-    // Then assert the SVG border wrapper is present
-    // TODO: trigger fireEvent(wrapper, 'layout', { nativeEvent: { layout: { width: 300, height: 120 } } })
+    // layout bubbles up to the wrapper's onLayout handler
+    fireEvent(screen.getByText('Child'), 'layout', {
+      nativeEvent: { layout: { x: 0, y: 0, width: 300, height: 120 } },
+    });
+    const svg = screen.getByTestId('hairline-svg');
+    expect(svg.props.width).toBe(300);
+    expect(svg.props.height).toBe(120);
   });
 
   it('renders multiple children without issue', () => {

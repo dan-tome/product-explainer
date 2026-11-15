@@ -5,7 +5,8 @@ import { Ingredient } from '../types/product';
 jest.mock('react-native-svg', () => {
   const React = require('react');
   const { View } = require('react-native');
-  const Stub = ({ children }: { children?: React.ReactNode }) => React.createElement(View, {}, children);
+  const Stub = ({ children }: { children?: React.ReactNode }) =>
+    React.createElement(View, {}, children);
   return {
     __esModule: true,
     default: Stub,
@@ -60,7 +61,10 @@ describe('DailySnapshot', () => {
 
   it('shows "Shifting light" headline for high-risk ingredients', () => {
     const ingredients = Array.from({ length: 5 }, () =>
-      makeIngredient({ status: 'avoid', allergen_info: { is_match: true, alias_detected: 'Milk' } }),
+      makeIngredient({
+        status: 'avoid',
+        allergen_info: { is_match: true, alias_detected: 'Milk' },
+      }),
     );
     render(<DailySnapshot ingredients={ingredients} />);
     expect(screen.getByText('Shifting light')).toBeTruthy();

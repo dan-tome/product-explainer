@@ -53,7 +53,7 @@ const ALLERGEN_ALIASES = new Map<string, string>([
 ]);
 
 const IDENTITY_NOTES: Record<string, string> = {
-  Milk: 'This ingredient is derived from cow\'s milk.',
+  Milk: "This ingredient is derived from cow's milk.",
   Egg: 'This ingredient is derived from eggs.',
   Wheat: 'This ingredient is derived from wheat and contains gluten.',
 };

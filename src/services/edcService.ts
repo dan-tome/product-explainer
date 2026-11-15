@@ -36,7 +36,10 @@ export const checkEDC = (ingredient: string): EDCMatch | null => {
  * Returns true when the ingredient's exposure_context or risk_family indicates
  * a respiratory hazard requiring the ventilation advisory.
  */
-export const isRespiratoryHazard = (exposureContext: string, riskFamily: string | null): boolean => {
+export const isRespiratoryHazard = (
+  exposureContext: string,
+  riskFamily: string | null,
+): boolean => {
   if (riskFamily === 'CORROSIVE') return true;
   const lower = exposureContext.toLowerCase();
   return (

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Animated, StyleSheet, Text, View } from 'react-native';
+import { Animated, StyleSheet, View } from 'react-native';
 import { RESEARCH_PALETTE } from '../styles/Theme';
 import { MOTION } from '../styles/motion';
 import type { ValidatedFamilySignal } from '../types/universalBridge';
@@ -47,7 +47,7 @@ export const ScienceNoteReveal: React.FC<Props> = ({ signal }) => {
     const run = Animated.stagger(MOTION.hydrateStaggerMs, steps);
     run.start();
     return () => run.stop();
-  }, [signal.familyId, signal.label, signal.detail]);
+  }, [signal.familyId, signal.label, signal.detail, lineKicker, lineTitle, lineDetail]);
 
   const purple = RESEARCH_PALETTE.secondary;
 
@@ -58,7 +58,9 @@ export const ScienceNoteReveal: React.FC<Props> = ({ signal }) => {
         {signal.label}
       </Animated.Text>
       {signal.detail ? (
-        <Animated.Text style={[styles.detail, { opacity: lineDetail }]}>{signal.detail}</Animated.Text>
+        <Animated.Text style={[styles.detail, { opacity: lineDetail }]}>
+          {signal.detail}
+        </Animated.Text>
       ) : null}
     </View>
   );

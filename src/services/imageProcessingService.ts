@@ -2,7 +2,7 @@ import * as ImageManipulator from 'expo-image-manipulator';
 
 export const preprocessImageForOCR = async (
   uri: string,
-  photoDimensions: { width: number; height: number }
+  photoDimensions: { width: number; height: number },
 ): Promise<string> => {
   const { width, height } = photoDimensions;
   const cropWidth = Math.round(width * 0.8);
@@ -16,7 +16,7 @@ export const preprocessImageForOCR = async (
       { crop: { originX, originY, width: cropWidth, height: cropHeight } },
       { resize: { width: 1500 } },
     ],
-    { compress: 1, format: ImageManipulator.SaveFormat.PNG }
+    { compress: 1, format: ImageManipulator.SaveFormat.PNG },
   );
 
   return result.uri;

@@ -35,7 +35,10 @@ const mockDetectProductType = detectProductType as jest.Mock;
 
 import ResultsScreen from '../app/results';
 
-const makeIngredient = (common_name: string, status: Ingredient['status'] = 'safe'): Ingredient => ({
+const makeIngredient = (
+  common_name: string,
+  status: Ingredient['status'] = 'safe',
+): Ingredient => ({
   scientific_name: common_name,
   common_name,
   functional_purpose: `Provides ${common_name} benefit - Function`,
@@ -62,7 +65,9 @@ const MOCK_RESULTS: Ingredient[] = [
 describe('ResultsScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockParams.mockReturnValue({ text: 'Water, Sugar, Maltodextrin, Palm Oil, Salt, Citric Acid, Soy Lecithin' });
+    mockParams.mockReturnValue({
+      text: 'Water, Sugar, Maltodextrin, Palm Oil, Salt, Citric Acid, Soy Lecithin',
+    });
     mockAnalyze.mockResolvedValue(MOCK_RESULTS);
     mockDetectProductType.mockReturnValue('FOOD');
   });
@@ -98,9 +103,7 @@ describe('ResultsScreen', () => {
   it('shows empty state when analysis returns no ingredients', async () => {
     mockAnalyze.mockResolvedValue([]);
     render(<ResultsScreen />);
-    await waitFor(() =>
-      expect(screen.getByText(/nothing found this pass/i)).toBeTruthy(),
-    );
+    await waitFor(() => expect(screen.getByText(/nothing found this pass/i)).toBeTruthy());
   });
 
   it('fires selection haptic when First Light slate applies (UNKNOWN + ingredients)', async () => {

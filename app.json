@@ -26,9 +26,7 @@
       "predictiveBackGestureEnabled": false,
       "minSdkVersion": 24,
       "targetSdkVersion": 35,
-      "permissions": [
-        "android.permission.CAMERA"
-      ]
+      "permissions": ["android.permission.CAMERA"]
     },
     "web": {
       "favicon": "./assets/favicon.png"

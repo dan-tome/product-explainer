@@ -30,14 +30,20 @@ const usePulse = () => {
   return opacity;
 };
 
-const SkeletonBlock = ({ width, height, style }: { width: number | string; height: number; style?: object }) => (
-  <View style={[{ width, height, backgroundColor: '#E0E0E0', borderRadius: 6 }, style]} />
-);
+const SkeletonBlock = ({
+  width,
+  height,
+  style,
+}: {
+  width: number | string;
+  height: number;
+  style?: object;
+}) => <View style={[{ width, height, backgroundColor: '#E0E0E0', borderRadius: 6 }, style]} />;
 
 const SkeletonPulseCard = ({ width }: { width: number }) => {
   const opacity = usePulse();
   return (
-    <Animated.View style={[styles.pulseCard, { width, opacity }]}>
+    <Animated.View testID="skeleton-pulse-card" style={[styles.pulseCard, { width, opacity }]}>
       <SkeletonBlock width={60} height={8} />
       <SkeletonBlock width={width * 0.6} height={18} style={styles.mt8} />
       <SkeletonBlock width={width * 0.85} height={10} style={styles.mt6} />
@@ -48,7 +54,7 @@ const SkeletonPulseCard = ({ width }: { width: number }) => {
 const SkeletonIngredientCard = () => {
   const opacity = usePulse();
   return (
-    <Animated.View style={[styles.ingredientCard, { opacity }]}>
+    <Animated.View testID="skeleton-ingredient-card" style={[styles.ingredientCard, { opacity }]}>
       <View style={styles.ingredientRow}>
         <SkeletonBlock width="55%" height={14} />
         <SkeletonBlock width={60} height={22} style={{ borderRadius: 11 }} />
@@ -59,7 +65,13 @@ const SkeletonIngredientCard = () => {
 };
 
 export const SkeletonLoader: React.FC = () => (
-  <View style={styles.container}>
+  <View
+    style={styles.container}
+    accessible
+    accessibilityRole="progressbar"
+    accessibilityLabel="Analysing ingredients"
+    accessibilityState={{ busy: true }}
+  >
     {/* ProductPulse skeleton — hero card is 15% wider */}
     <ScrollView
       horizontal

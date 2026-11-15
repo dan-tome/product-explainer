@@ -10,8 +10,13 @@ jest.mock('./edcService', () => ({
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { checkEDC } from './edcService';
 import {
-  addScan, removeScan, getCompoundExposures,
-  getScannedProducts, getRoutineSummary, clearRoutine, loadRoutine,
+  addScan,
+  removeScan,
+  getCompoundExposures,
+  getScannedProducts,
+  getRoutineSummary,
+  clearRoutine,
+  loadRoutine,
 } from './routineService';
 import type { ScannedProduct } from './routineService';
 import { Ingredient } from '../types/product';
@@ -128,7 +133,12 @@ describe('getCompoundExposures — EDC tracking', () => {
   beforeEach(() => {
     mockCheckEDC.mockImplementation((name: string) =>
       name === 'Methylparaben'
-        ? { ingredient: name, family: 'Paraben', concern: 'EDC concern', regulation: 'EU restricted.' }
+        ? {
+            ingredient: name,
+            family: 'Paraben',
+            concern: 'EDC concern',
+            regulation: 'EU restricted.',
+          }
         : null,
     );
   });
@@ -165,8 +175,10 @@ describe('getCompoundExposures — EDC tracking', () => {
 
   it('sorts compound exposures by occurrences descending', () => {
     mockCheckEDC.mockImplementation((name: string) => {
-      if (name === 'Methylparaben') return { ingredient: name, family: 'Paraben', concern: 'EDC', regulation: '' };
-      if (name === 'Triclosan') return { ingredient: name, family: 'Antimicrobial', concern: 'EDC', regulation: '' };
+      if (name === 'Methylparaben')
+        return { ingredient: name, family: 'Paraben', concern: 'EDC', regulation: '' };
+      if (name === 'Triclosan')
+        return { ingredient: name, family: 'Antimicrobial', concern: 'EDC', regulation: '' };
       return null;
     });
     // Methylparaben in 3 products, Triclosan in 2
@@ -257,7 +269,10 @@ describe('loadRoutine', () => {
   it('hydrates products from storage written by a previous session', async () => {
     // Seed AsyncStorage directly (simulating data persisted by a prior app session)
     const stored: [string, ScannedProduct][] = [
-      ['p1', { id: 'p1', label: 'Cleanser', ingredients: CLEANSER_INGREDIENTS, scannedAt: Date.now() }],
+      [
+        'p1',
+        { id: 'p1', label: 'Cleanser', ingredients: CLEANSER_INGREDIENTS, scannedAt: Date.now() },
+      ],
     ];
     await AsyncStorage.setItem('@healthscan/routine-v1', JSON.stringify(stored));
 

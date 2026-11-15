@@ -42,6 +42,8 @@ describe('extractTextFromImage', () => {
 
   it('rethrows ML Kit errors with a prefixed message', async () => {
     mockRecognize.mockRejectedValue(new Error('native crash'));
-    await expect(extractTextFromImage('file:///bad.jpg')).rejects.toThrow('OCR failed: native crash');
+    await expect(extractTextFromImage('file:///bad.jpg')).rejects.toThrow(
+      'OCR failed: native crash',
+    );
   });
 });

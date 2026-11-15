@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react-native';
+import { render, screen, within } from '@testing-library/react-native';
 
 jest.mock('react-native', () => {
   const RN = jest.requireActual('react-native');
@@ -36,11 +36,7 @@ const makeSignal = (overrides: Partial<ValidatedFamilySignal> = {}): ValidatedFa
   ...overrides,
 });
 
-describe.skip('ScienceNoteReveal', () => {
-  it('renders without crashing', () => {
-    render(<ScienceNoteReveal signal={makeSignal()} />);
-  });
-
+describe('ScienceNoteReveal', () => {
   it('shows the "Science note" kicker', () => {
     render(<ScienceNoteReveal signal={makeSignal()} />);
     expect(screen.getByText('Science note')).toBeTruthy();
@@ -68,7 +64,8 @@ describe.skip('ScienceNoteReveal', () => {
 
   it('has accessible role of text on the wrapper', () => {
     render(<ScienceNoteReveal signal={makeSignal()} />);
-    expect(screen.getByRole('text')).toBeTruthy();
+    const wrapper = screen.getAllByRole('text')[0];
+    expect(within(wrapper).getByText('Science note')).toBeTruthy();
   });
 
   it('starts animations on mount', () => {
@@ -80,7 +77,11 @@ describe.skip('ScienceNoteReveal', () => {
     const { rerender } = render(<ScienceNoteReveal signal={makeSignal({ familyId: 'thyroid' })} />);
     // Should not throw when signal identity changes (new product scan)
     expect(() =>
-      rerender(<ScienceNoteReveal signal={makeSignal({ familyId: 'estrogen', label: 'Estrogen pathway' })} />),
+      rerender(
+        <ScienceNoteReveal
+          signal={makeSignal({ familyId: 'estrogen', label: 'Estrogen pathway' })}
+        />,
+      ),
     ).not.toThrow();
     expect(screen.getByText('Estrogen pathway')).toBeTruthy();
   });

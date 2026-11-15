@@ -4,7 +4,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { RESEARCH_PALETTE } from '../styles/Theme';
 import { MOTION } from '../styles/motion';
 import type { ProductType } from '../types/product';
-import type { CumulativeResearchNote as CumulativeNoteModel, ValidatedFamilySignal } from '../types/universalBridge';
+import type {
+  CumulativeResearchNote as CumulativeNoteModel,
+  ValidatedFamilySignal,
+} from '../types/universalBridge';
 import { CumulativeResearchNote } from './CumulativeResearchNote';
 import { DiscoveryHero } from './DiscoveryHero';
 import { ScienceNoteReveal } from './ScienceNoteReveal';

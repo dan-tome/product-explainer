@@ -12,11 +12,11 @@ export interface AllergenInfo {
 export interface Ingredient {
   scientific_name: string;
   common_name: string;
-  functional_purpose: string;  // [Benefit] - [Scientific Action]
+  functional_purpose: string; // [Benefit] - [Scientific Action]
   regulatory_context: string;
-  exposure_context: string;    // usage guardrail; required for CORROSIVE/IRRITANT/SENSITIZER
-  science_note: string;        // one-sentence mechanism / chemistry explanation
-  literacy_flag: string;       // educational "did you know" takeaway
+  exposure_context: string; // usage guardrail; required for CORROSIVE/IRRITANT/SENSITIZER
+  science_note: string; // one-sentence mechanism / chemistry explanation
+  literacy_flag: string; // educational "did you know" takeaway
   risk_family: RiskFamily;
   status: IngredientStatus;
   is_ai_generated: boolean;

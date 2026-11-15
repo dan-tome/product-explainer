@@ -43,7 +43,13 @@ export default function ResultsScreen() {
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
-        <Stack.Screen options={{ title: 'Analysing…', headerStyle: { backgroundColor: '#fff' }, headerTintColor: '#1a1a1a' }} />
+        <Stack.Screen
+          options={{
+            title: 'Analysing…',
+            headerStyle: { backgroundColor: '#fff' },
+            headerTintColor: '#1a1a1a',
+          }}
+        />
 
         <View testID="loading-indicator" style={styles.loaderContainer}>
           <SkeletonLoader />
@@ -57,7 +63,11 @@ export default function ResultsScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <Stack.Screen
-        options={{ title: 'Results', headerStyle: { backgroundColor: '#fff' }, headerTintColor: '#1a1a1a' }}
+        options={{
+          title: 'Results',
+          headerStyle: { backgroundColor: '#fff' },
+          headerTintColor: '#1a1a1a',
+        }}
       />
 
       <ResearchSlateContainer
@@ -92,7 +102,9 @@ export default function ResultsScreen() {
                       <Text
                         style={[
                           styles.ingredientsToggleOption,
-                          showScientific ? styles.ingredientsToggleInactive : styles.ingredientsToggleActive,
+                          showScientific
+                            ? styles.ingredientsToggleInactive
+                            : styles.ingredientsToggleActive,
                         ]}
                       >
                         Common
@@ -106,7 +118,9 @@ export default function ResultsScreen() {
                       <Text
                         style={[
                           styles.ingredientsToggleOption,
-                          showScientific ? styles.ingredientsToggleActive : styles.ingredientsToggleInactive,
+                          showScientific
+                            ? styles.ingredientsToggleActive
+                            : styles.ingredientsToggleInactive,
                         ]}
                       >
                         INCI

@@ -13,7 +13,9 @@ jest.mock('react-native', () => {
   // RN's animation internals pass { finished: boolean } to the completion callback.
   const animResult = { finished: true };
   RN.Animated.timing = () => ({ start: (cb?: (r: typeof animResult) => void) => cb?.(animResult) });
-  RN.Animated.parallel = () => ({ start: (cb?: (r: typeof animResult) => void) => cb?.(animResult) });
+  RN.Animated.parallel = () => ({
+    start: (cb?: (r: typeof animResult) => void) => cb?.(animResult),
+  });
   return RN;
 });
 
@@ -72,11 +74,14 @@ describe('IngredientCard — Level 1 (default)', () => {
     expect(screen.getByText('Contains Milk')).toBeTruthy();
   });
 
-  it('renders for every status without crashing', () => {
-    (['safe', 'warning', 'avoid', 'unknown'] as const).forEach(status => {
-      const { unmount } = render(<IngredientCard ingredient={makeIngredient({ status })} />);
-      unmount();
-    });
+  it.each([
+    ['safe', 'Safe'],
+    ['warning', 'Review'],
+    ['avoid', 'Avoid'],
+    ['unknown', 'Unknown'],
+  ] as const)('labels status "%s" with the neutral badge "%s"', (status, label) => {
+    render(<IngredientCard ingredient={makeIngredient({ status })} />);
+    expect(screen.getByText(label)).toBeTruthy();
   });
 });
 
@@ -96,7 +101,9 @@ describe('IngredientCard — Level 2 (first tap)', () => {
   });
 
   it('reveals exposure_context after first tap', () => {
-    render(<IngredientCard ingredient={makeIngredient({ exposure_context: 'Avoid eye contact.' })} />);
+    render(
+      <IngredientCard ingredient={makeIngredient({ exposure_context: 'Avoid eye contact.' })} />,
+    );
     fireEvent.press(screen.getByText('Vitamin C'));
     expect(screen.getByText('Avoid eye contact.')).toBeTruthy();
   });

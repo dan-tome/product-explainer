@@ -18,7 +18,9 @@ export const TransparencySandwich: React.FC<Props> = ({ children, showVentilatio
       <MagnifyingGlassSvg />
     </View>
     <View style={styles.fill}>{children}</View>
-    <View style={styles.side}>{showVentilation ? <VentilationSvg /> : <View style={styles.iconSpacer} />}</View>
+    <View style={styles.side}>
+      {showVentilation ? <VentilationSvg /> : <View style={styles.iconSpacer} />}
+    </View>
   </View>
 );
 
@@ -27,7 +29,15 @@ export function MagnifyingGlassSvg() {
   return (
     <Svg width={ICON} height={ICON} viewBox="0 0 24 24" accessibilityLabel="Scientific scrutiny">
       <Circle cx="10" cy="10" r="6.5" fill="none" stroke={stroke} strokeWidth="1.75" />
-      <Line x1="14.5" y1="14.5" x2="20" y2="20" stroke={stroke} strokeWidth="1.75" strokeLinecap="round" />
+      <Line
+        x1="14.5"
+        y1="14.5"
+        x2="20"
+        y2="20"
+        stroke={stroke}
+        strokeWidth="1.75"
+        strokeLinecap="round"
+      />
     </Svg>
   );
 }

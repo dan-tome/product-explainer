@@ -14,7 +14,9 @@ export const SessionSnapshotToast: React.FC = () => (
     accessibilityLabel="Session snapshot. This ingredient is part of a larger picture for this scan."
   >
     <Text style={styles.kicker}>Session snapshot</Text>
-    <Text style={styles.body}>Connects to your running picture for this product — one piece of the whole.</Text>
+    <Text style={styles.body}>
+      Connects to your running picture for this product — one piece of the whole.
+    </Text>
   </View>
 );
 

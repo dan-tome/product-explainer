@@ -1,6 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react-native';
-import { act } from '@testing-library/react-native';
+import { act, render, renderHook, screen } from '@testing-library/react-native';
 
 jest.mock('react-native', () => {
   const RN = jest.requireActual('react-native');
@@ -8,14 +7,17 @@ jest.mock('react-native', () => {
   RN.Animated.timing = () => ({ start: (cb?: (r: typeof animResult) => void) => cb?.(animResult) });
   RN.Animated.spring = () => ({ start: (cb?: (r: typeof animResult) => void) => cb?.(animResult) });
   RN.Animated.loop = () => ({ start: jest.fn() });
-  RN.Animated.sequence = () => ({ start: (cb?: (r: typeof animResult) => void) => cb?.(animResult) });
+  RN.Animated.sequence = () => ({
+    start: (cb?: (r: typeof animResult) => void) => cb?.(animResult),
+  });
   return RN;
 });
 
 jest.mock('react-native-svg', () => {
   const React = require('react');
   const { View } = require('react-native');
-  const Stub = ({ children }: { children?: React.ReactNode }) => React.createElement(View, {}, children);
+  const Stub = ({ children }: { children?: React.ReactNode }) =>
+    React.createElement(View, {}, children);
   return {
     __esModule: true,
     default: Stub,
@@ -30,7 +32,6 @@ jest.mock('react-native-svg', () => {
 });
 
 import { CameraOverlay, useOverlayLayout } from './CameraOverlay';
-import { renderHook } from '@testing-library/react-native';
 
 const defaultProps = {
   state: 'passive_search' as const,
@@ -56,21 +57,15 @@ describe('CameraOverlay', () => {
   });
 
   it('renders without crashing in barcode_lock state', () => {
-    expect(() =>
-      render(<CameraOverlay {...defaultProps} state="barcode_lock" />),
-    ).not.toThrow();
+    expect(() => render(<CameraOverlay {...defaultProps} state="barcode_lock" />)).not.toThrow();
   });
 
   it('renders without crashing in ocr_synthesis state', () => {
-    expect(() =>
-      render(<CameraOverlay {...defaultProps} state="ocr_synthesis" />),
-    ).not.toThrow();
+    expect(() => render(<CameraOverlay {...defaultProps} state="ocr_synthesis" />)).not.toThrow();
   });
 
   it('renders without crashing in handoff state', () => {
-    expect(() =>
-      render(<CameraOverlay {...defaultProps} state="handoff" />),
-    ).not.toThrow();
+    expect(() => render(<CameraOverlay {...defaultProps} state="handoff" />)).not.toThrow();
   });
 
   it('shows ghost pill label when state is barcode_lock and ghostLabel is set', () => {

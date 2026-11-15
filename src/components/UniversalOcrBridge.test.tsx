@@ -1,11 +1,14 @@
 import React from 'react';
+import { Text } from 'react-native';
 import { render, screen } from '@testing-library/react-native';
 
 jest.mock('react-native', () => {
   const RN = jest.requireActual('react-native');
   const animResult = { finished: true };
   RN.Animated.timing = () => ({ start: (cb?: (r: typeof animResult) => void) => cb?.(animResult) });
-  RN.Animated.parallel = () => ({ start: (cb?: (r: typeof animResult) => void) => cb?.(animResult) });
+  RN.Animated.parallel = () => ({
+    start: (cb?: (r: typeof animResult) => void) => cb?.(animResult),
+  });
   return RN;
 });
 
@@ -29,18 +32,30 @@ import { ScanStage, BridgeHandoff, ResearchSlateContainer } from './UniversalOcr
 
 describe('ScanStage', () => {
   it('renders header kicker text', () => {
-    render(<ScanStage><></></ScanStage>);
+    render(
+      <ScanStage>
+        <></>
+      </ScanStage>,
+    );
     expect(screen.getByText('Universal interpreter')).toBeTruthy();
   });
 
   it('renders header title text', () => {
-    render(<ScanStage><></></ScanStage>);
+    render(
+      <ScanStage>
+        <></>
+      </ScanStage>,
+    );
     expect(screen.getByText('Bridge from label to research')).toBeTruthy();
   });
 
   it('renders children', () => {
-    render(<ScanStage><></></ScanStage>);
-    // no crash = children slot accepted
+    render(
+      <ScanStage>
+        <Text>Viewfinder</Text>
+      </ScanStage>,
+    );
+    expect(screen.getByText('Viewfinder')).toBeTruthy();
   });
 });
 
@@ -76,23 +91,15 @@ describe('ResearchSlateContainer', () => {
     expect(screen.queryByText('Research slate')).toBeNull();
   });
 
-  it('renders children', () => {
-    render(
-      <ResearchSlateContainer productType="FOOD" ingredientCount={3}>
-        <></>
-      </ResearchSlateContainer>,
-    );
-    // no crash = slot accepted
-  });
-
-  it('renders without crashing for all product types', () => {
-    (['FOOD', 'COSMETIC', 'HOUSEHOLD', 'UNKNOWN'] as const).forEach(pt => {
-      const { unmount } = render(
+  it.each(['FOOD', 'COSMETIC', 'HOUSEHOLD', 'UNKNOWN'] as const)(
+    'renders children for %s products',
+    pt => {
+      render(
         <ResearchSlateContainer productType={pt} ingredientCount={5}>
-          <></>
+          <Text>Ingredient list</Text>
         </ResearchSlateContainer>,
       );
-      unmount();
-    });
-  });
+      expect(screen.getByText('Ingredient list')).toBeTruthy();
+    },
+  );
 });

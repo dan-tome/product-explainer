@@ -65,7 +65,14 @@ export const IngredientCard: React.FC<Props> = ({
     ]);
     entrance.start();
     return () => entrance.stop();
-  }, [ingredient.common_name, ingredient.functional_purpose, ingredient.scientific_name, showScientific]);
+  }, [
+    ingredient.common_name,
+    ingredient.functional_purpose,
+    ingredient.scientific_name,
+    showScientific,
+    hydrateHeader,
+    hydratePurpose,
+  ]);
 
   const advance = () => {
     if (level === 0) {
@@ -128,7 +135,10 @@ export const IngredientCard: React.FC<Props> = ({
     >
       {/* ── Level 1: “What” (purpose) first, then identity (name + badge) ── */}
       <Animated.View style={{ opacity: hydratePurpose }}>
-        <Text style={[styles.purpose, styles.purposeLead]} numberOfLines={level === 0 ? 1 : undefined}>
+        <Text
+          style={[styles.purpose, styles.purposeLead]}
+          numberOfLines={level === 0 ? 1 : undefined}
+        >
           {ingredient.functional_purpose}
         </Text>
       </Animated.View>

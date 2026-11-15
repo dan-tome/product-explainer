@@ -2,7 +2,7 @@ import React, { useId, useMemo, useState } from 'react';
 import { LayoutChangeEvent, StyleSheet, Text, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import { Cloud, CloudSun, Sun } from 'lucide-react-native';
-import { Ingredient, IngredientStatus } from '../types/product';
+import { Ingredient } from '../types/product';
 import { RESEARCH_PALETTE } from '../styles/Theme';
 import { OUTLOOK_COPY, buildSegments, headlineForTone } from './dailySnapshotMetrics';
 

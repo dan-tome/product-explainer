@@ -70,7 +70,9 @@ describe('isRespiratoryHazard', () => {
   });
 
   it('returns true when exposure_context mentions respiratory', () => {
-    expect(isRespiratoryHazard('Avoid respiratory exposure. Use in ventilated area.', null)).toBe(true);
+    expect(isRespiratoryHazard('Avoid respiratory exposure. Use in ventilated area.', null)).toBe(
+      true,
+    );
   });
 
   it('returns true when exposure_context mentions inhale', () => {

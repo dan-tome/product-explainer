@@ -1,6 +1,10 @@
 import { Ingredient } from '../types/product';
 import { checkEDC } from '../services/edcService';
-import type { AggregateBridgeResult, CumulativeResearchNote, ValidatedFamilySignal } from '../types/universalBridge';
+import type {
+  AggregateBridgeResult,
+  CumulativeResearchNote,
+  ValidatedFamilySignal,
+} from '../types/universalBridge';
 
 /** Toxicology Phase D — pathway markers (canonical alias substrings). */
 const THYROID_PATHWAY_MARKERS = ['resorcinol'] as const;
@@ -47,8 +51,7 @@ export function isCompoundGroupMember(ingredient: Ingredient, synergyActive: boo
 function buildCumulativeNote(): CumulativeResearchNote {
   return {
     title: 'Cumulative research note',
-    body:
-      'This scan links thyroid- and estrogen-pathway signals (Resorcinol-class and Oxybenzone-class). They’re read together for aggregate context — not as isolated verdicts.',
+    body: 'This scan links thyroid- and estrogen-pathway signals (Resorcinol-class and Oxybenzone-class). They’re read together for aggregate context — not as isolated verdicts.',
   };
 }
 
@@ -89,6 +92,8 @@ export function resolveAggregateBridge(ingredients: Ingredient[]): AggregateBrid
 }
 
 /** @deprecated Use resolveAggregateBridge — retained for narrow call sites */
-export function resolveValidatedFamilyForUi(ingredients: Ingredient[]): ValidatedFamilySignal | null {
+export function resolveValidatedFamilyForUi(
+  ingredients: Ingredient[],
+): ValidatedFamilySignal | null {
   return resolveAggregateBridge(ingredients).validatedFamily;
 }
