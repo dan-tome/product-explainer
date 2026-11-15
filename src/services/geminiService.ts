@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenerativeAI, SchemaType, type ResponseSchema } from '@google/generative-ai';
 import { Ingredient, IngredientStatus, ProductType, RiskFamily } from '../types/product';
 
 // One-shot anchor provided by Science Lead — establishes the Hybrid Guardrail structure.
@@ -36,6 +36,7 @@ For each token:
 1. If clearly not an ingredient (garbled text, brand names, marketing copy), omit it entirely.
 2. Correct any OCR errors.
 3. Return a JSON object with these exact fields:
+   - "source_token": the input token this entry explains, copied exactly as given (before any OCR correction)
    - "scientific_name": INCI or chemical name as it appears on the label
    - "common_name": everyday human-readable name (e.g. "Vitamin C", not "Ascorbic Acid")
    - "functional_purpose": Format strictly as "[Benefit] - [Scientific Action]" (e.g. "Prevents spoilage - Preservative")
@@ -58,6 +59,7 @@ Tokens:
 `.trim();
 
 type GeminiRaw = {
+  source_token?: string;
   scientific_name?: string;
   common_name?: string;
   functional_purpose?: string;
@@ -68,6 +70,43 @@ type GeminiRaw = {
   risk_family?: unknown;
   status?: string;
 };
+
+const STRING_FIELDS = [
+  'source_token',
+  'scientific_name',
+  'common_name',
+  'functional_purpose',
+  'regulatory_context',
+  'exposure_context',
+  'science_note',
+  'literacy_flag',
+] as const;
+
+/** Gemini structured-output schema: constrains the model to an array of ingredient objects. */
+export const INGREDIENT_RESPONSE_SCHEMA: ResponseSchema = {
+  type: SchemaType.ARRAY,
+  items: {
+    type: SchemaType.OBJECT,
+    properties: {
+      ...Object.fromEntries(STRING_FIELDS.map(f => [f, { type: SchemaType.STRING }])),
+      risk_family: {
+        type: SchemaType.STRING,
+        format: 'enum',
+        enum: ['CORROSIVE', 'IRRITANT', 'SENSITIZER'],
+        nullable: true,
+      },
+      status: {
+        type: SchemaType.STRING,
+        format: 'enum',
+        enum: ['safe', 'warning', 'avoid', 'unknown'],
+      },
+    },
+    required: [...STRING_FIELDS, 'risk_family', 'status'],
+  },
+};
+
+export const GEMINI_TIMEOUT_MS = 20_000;
+export const GEMINI_MAX_ATTEMPTS = 2;
 
 const toRiskFamily = (value: unknown): RiskFamily => {
   if (value === 'CORROSIVE' || value === 'IRRITANT' || value === 'SENSITIZER') return value;
@@ -89,6 +128,65 @@ const toIngredient = (raw: GeminiRaw, token: string): Omit<Ingredient, 'allergen
   is_ai_generated: true,
 });
 
+/** Runtime guard: keep only plain objects, and only string values for string fields. */
+const sanitizeRaw = (value: unknown): GeminiRaw | null => {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) return null;
+  const record = value as Record<string, unknown>;
+  const raw: GeminiRaw = { risk_family: record.risk_family };
+  for (const field of STRING_FIELDS) {
+    const v = record[field];
+    if (typeof v === 'string') raw[field] = v;
+  }
+  if (typeof record.status === 'string') raw.status = record.status;
+  return raw;
+};
+
+/** Parses the model's text into raw entries; throws if it is not a JSON array. */
+export const parseGeminiResponse = (text: string): GeminiRaw[] => {
+  const parsed: unknown = JSON.parse(text);
+  if (!Array.isArray(parsed)) throw new Error('Gemini response is not a JSON array');
+  return parsed.map(sanitizeRaw).filter((r): r is GeminiRaw => r !== null);
+};
+
+const normalizeToken = (t: string) => t.trim().replace(/\s+/g, ' ').toLowerCase();
+
+/**
+ * Joins model output back to the input tokens by the echoed `source_token`, never by array position:
+ * the model is told to drop non-ingredients, so positions shift as soon as it drops anything.
+ * - Entries whose source_token is not an input token are discarded (hallucination guard).
+ * - Tokens the model dropped are omitted (it judged them not to be ingredients).
+ * - Legacy responses with no source_token at all are joined by position only when the counts
+ *   match exactly; otherwise they are kept without a token fallback.
+ * Output follows input-token order.
+ */
+export const joinByToken = (
+  tokens: string[],
+  entries: GeminiRaw[],
+): Omit<Ingredient, 'allergen_info'>[] => {
+  const hasEchoes = entries.some(e => typeof e.source_token === 'string' && e.source_token !== '');
+  if (!hasEchoes) {
+    if (entries.length === tokens.length) return entries.map((e, i) => toIngredient(e, tokens[i]));
+    return entries
+      .filter(e => e.scientific_name || e.common_name)
+      .map(e => toIngredient(e, e.scientific_name || e.common_name || ''));
+  }
+
+  const unclaimed = new Map<string, GeminiRaw[]>();
+  for (const entry of entries) {
+    if (!entry.source_token) continue;
+    const key = normalizeToken(entry.source_token);
+    unclaimed.set(key, [...(unclaimed.get(key) ?? []), entry]);
+  }
+
+  const results: Omit<Ingredient, 'allergen_info'>[] = [];
+  for (const token of tokens) {
+    const queue = unclaimed.get(normalizeToken(token));
+    const entry = queue?.shift();
+    if (entry) results.push(toIngredient(entry, token));
+  }
+  return results;
+};
+
 export const analyzeWithGemini = async (
   ingredients: string[],
   productType: ProductType = 'FOOD',
@@ -96,15 +194,28 @@ export const analyzeWithGemini = async (
   if (ingredients.length === 0) return [];
 
   const genAI = new GoogleGenerativeAI(process.env.EXPO_PUBLIC_GEMINI_API_KEY || '');
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+  const model = genAI.getGenerativeModel(
+    {
+      model: 'gemini-2.5-flash',
+      generationConfig: {
+        responseMimeType: 'application/json',
+        responseSchema: INGREDIENT_RESPONSE_SCHEMA,
+      },
+    },
+    { timeout: GEMINI_TIMEOUT_MS },
+  );
+  const prompt = buildPrompt(productType) + '\n' + ingredients.join('\n');
 
-  try {
-    const result = await model.generateContent(
-      buildPrompt(productType) + '\n' + ingredients.join('\n'),
-    );
-    const parsed: GeminiRaw[] = JSON.parse(result.response.text());
-    return parsed.map((raw, i) => toIngredient(raw, ingredients[i] ?? ''));
-  } catch {
-    return ingredients.map(token => toIngredient({}, token));
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= GEMINI_MAX_ATTEMPTS; attempt++) {
+    try {
+      const result = await model.generateContent(prompt);
+      return joinByToken(ingredients, parseGeminiResponse(result.response.text()));
+    } catch (error) {
+      lastError = error;
+    }
   }
+
+  console.warn('[gemini] analysis failed after retry; showing unexplained ingredients', lastError);
+  return ingredients.map(token => toIngredient({}, token));
 };
