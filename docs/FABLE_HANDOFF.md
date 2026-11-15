@@ -6,7 +6,7 @@
 
 HealthScan is a public portfolio piece. A hiring manager should be able to look at it for about 5 minutes and come away convinced of four things: TypeScript end to end, rigorous LLM engineering, mobile craft, and responsible handling of health information. Rank every task by how much it changes that 5-minute impression.
 
-**Public-safe rule:** this repo will be public. Never write employer names, colleague names or personal career details into code, docs, commits or PRs. The career brief that shaped this plan stays private and isn't needed to execute it.
+**Public-safe rule:** this repo is **already public**. Never write employer names, colleague names or personal career details into code, docs, commits or PRs. The career brief that shaped this plan stays private and isn't needed to execute it.
 
 **Budget rule:** £0. Use free tiers only (Azure free/consumption plan, GitHub Actions, EAS free tier, Sentry free tier). No paid developer accounts: no Google Play, no Apple TestFlight.
 
@@ -84,7 +84,7 @@ Execute in order. Each milestone is about 10 to 20 small, reviewable commits or 
 
 | # | Milestone | Definition of done | Goals |
 |---|---|---|---|
-| **M1** | **Go public safely** | `temp/` and `.idea/` are no longer tracked and are in `.gitignore`. `.claude/settings.local.json` is no longer tracked. ESLint and Prettier run in CI. All 74 skipped stubs are implemented or deleted, so there are 0 skipped tests. A gitleaks scan of the full history is clean. "Not medical advice" copy is in the app and the README. `.cursor/rules` facts are refreshed. CI is green with a badge. *Owner action:* rotate the Gemini key and make the repo public. | G2, G7 |
+| **M1** | **Go public safely** | `temp/` and `.idea/` are no longer tracked and are in `.gitignore`. `.claude/settings.local.json` is no longer tracked. ESLint and Prettier run in CI. All 74 skipped stubs are implemented or deleted, so there are 0 skipped tests. A gitleaks scan of the full history is clean. "Not medical advice" copy is in the app and the README. `.cursor/rules` facts are refreshed. CI is green with a badge. *Owner action:* revoke the leaked Gemini key (see Owner actions). The repo is already public. | G2, G7 |
 | **M2** | **Contract + serverless back end** | `shared/contract` v1 exists, with contract tests on both sides. The Azure Function `/analyze` is deployed by GitHub Actions (OIDC sign-in, Bicep, consumption plan). A CI check fails if the app bundle contains a key. `EXPO_PUBLIC_GEMINI_API_KEY` is removed. Gemini uses `responseSchema`. Results join by token, with a regression test for the position bug at `geminiService.ts:100`. Timeout, one retry, and a `degraded` flag shown as a calm notice in the palette's colours. | G4, G3 |
 | **M3** | **Evals in CI** | At least 40 golden labels (food, cosmetic, household, OCR-noisy text, French/Latin INCI, labels with marketing text mixed in). The replay tier runs on every PR. The live tier blocks prompt changes. Prompts are versioned in `shared/prompts`. The planted-fault table is published. A demonstration PR with a deliberate prompt regression fails CI (keep it as evidence). | G3 |
 | **M4** | **Mobile craft** | Results are cached so repeat scans work offline (key: token + prompt version). Camera permission states are handled: denied, limited, re-request. Scan-to-result time and startup time are measured on a low-end Android emulator profile and recorded in the README. Maestro flows run on an Android emulator in CI, driven by fixture images. | G5, G1 |
@@ -129,6 +129,7 @@ Execute in order. Each milestone is about 10 to 20 small, reviewable commits or 
 
 ## Owner actions (things only the owner can do)
 
-- Before going public in M1: rotate the Gemini key, make the repo public, and enable GitHub Pages.
+- **URGENT, done before anything else:** a live Gemini key was committed in `.claude/settings.local.json` (commit `50c16cd`, on `main`) in this public repo. Revoke it in Google AI Studio/Cloud Console and make a new one. The file is now untracked on this branch, but the key is still in history, so revoking it is the real fix. Rewriting history is optional and needs the owner's approval.
+- For M1: enable GitHub Pages.
 - For M2: an Azure subscription (free tier), and an OIDC federated credential for GitHub Actions. Add `GEMINI_API_KEY` as a repo secret.
 - For M6: an Expo account (free) for EAS builds, with `EXPO_TOKEN` added as a repo secret.
