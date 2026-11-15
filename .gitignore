@@ -39,3 +39,6 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# local agent settings (may contain machine paths / secrets)
+.claude/settings.local.json
