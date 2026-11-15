@@ -100,6 +100,12 @@ describe('ResultsScreen', () => {
     });
   });
 
+  it('shows the not-medical-advice footer with results', async () => {
+    render(<ResultsScreen />);
+    await waitFor(() => expect(screen.getByText('7 ingredients')).toBeTruthy());
+    expect(screen.getByTestId('medical-disclaimer')).toBeTruthy();
+  });
+
   it('shows empty state when analysis returns no ingredients', async () => {
     mockAnalyze.mockResolvedValue([]);
     render(<ResultsScreen />);

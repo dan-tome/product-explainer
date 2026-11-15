@@ -9,6 +9,7 @@ import { IngredientCard } from '../src/components/IngredientCard';
 import { DailySnapshot } from '../src/components/DailySnapshot';
 import { ProductPulse } from '../src/components/ProductPulse';
 import { SkeletonLoader } from '../src/components/SkeletonLoader';
+import { MedicalDisclaimer } from '../src/components/MedicalDisclaimer';
 import { RESEARCH_PALETTE } from '../src/styles/Theme';
 import { ResearchSlateContainer } from '../src/components/UniversalOcrBridge';
 import {
@@ -131,6 +132,7 @@ export default function ResultsScreen() {
               </View>
             ) : null
           }
+          ListFooterComponent={<MedicalDisclaimer />}
           contentContainerStyle={styles.listContent}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
