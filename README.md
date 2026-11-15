@@ -40,14 +40,25 @@ Phone (Expo / React Native, strict TypeScript)
 
 ## Testing the AI
 
-<!-- TODO(M3): golden-set size, latest scores, planted-fault table, link to the full eval report -->
-Coming in milestone 3: a golden set of real labels, automated accuracy and hallucination scoring, and evals that block merges in CI.
+A golden set of 12 realistic labels (OCR noise, marketing copy, French INCI, allergens hidden in compound ingredients) is scored on every PR. Each metric has a floor that only moves up, and CI fails below it. See [`evals/`](evals/README.md).
+
+| Offline tier (pipeline before the AI call) | Score |
+|---|---|
+| Ingredient extraction | 64/64 |
+| Declared allergens reach the model | 6/6, up from 4/6 after the evals exposed a bug |
+| Endocrine disruptors detected | 3/3 |
+| Non-ingredient text rejected | 8/12 |
+| Product type classification | 4/12 (next to improve) |
+
+Live scoring of Gemini's answers (accuracy, hallucination, safety floor, cost and latency) is coming in milestone 3. Full report: [`evals/results/offline.md`](evals/results/offline.md).
+
+<!-- TODO(M3): replay + live tiers, planted-fault table -->
 
 ## Engineering practices
 
 - **Strict TypeScript** throughout. `npm run typecheck` is a CI gate.
-- **CI on every PR:** ESLint (zero warnings allowed), Prettier, typecheck, Jest, and a full-history secret scan.
-- **275 tests, none skipped.** Core flows such as camera capture → OCR → handoff → navigation are tested against behaviour, and each behaviour was checked by planting a fault and confirming a test fails.
+- **CI on every PR:** ESLint (zero warnings allowed), Prettier, typecheck, Jest, offline evals, and a full-history secret scan.
+- **291 tests, none skipped.** Core flows such as camera capture → OCR → handoff → navigation are tested against behaviour, and each behaviour was checked by planting a fault and confirming a test fails.
 - Accessibility labels and roles on the primary controls.
 
 ## Responsible health information
