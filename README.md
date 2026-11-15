@@ -1,47 +1,69 @@
 # HealthScan
 
-Turn any product label into plain English. HealthScan scans ingredient lists with your phone camera and explains what each ingredient is, what it does, and what the research says — without jargon.
+[![CI](https://github.com/dan-tome/product-explainer/actions/workflows/ci.yml/badge.svg)](https://github.com/dan-tome/product-explainer/actions/workflows/ci.yml)
 
-## What it does
+**Point your phone at an ingredient label and get every ingredient explained in plain English.** Tocopherol becomes "Vitamin E: keeps the oil from going rancid". No jargon, and no scare colours.
 
-1. Point the camera at an ingredient list
-2. The app reads the label using on-device OCR (Google ML Kit)
-3. Gemini 2.5 Flash analyses every ingredient and returns plain-English explanations
-4. A results screen shows safety status, allergen flags, EDC concerns, and expandable science notes for each ingredient
+> 🚧 **Work in progress.** A live web demo, an installable Android build and published AI evaluation results are on the [roadmap](#roadmap). Current status: the Android app works end to end, and the test suite is green in CI.
 
-## Tech stack
+<!-- TODO(M6): hero GIF of a scan turning into explanations + links to the web demo and APK -->
 
-| Layer | Technology |
-|---|---|
-| Framework | React Native 0.83.6 + Expo SDK 55 (bare workflow) |
-| Navigation | Expo Router (file-based, `app/` directory) |
-| Camera & OCR | `expo-camera` + `@react-native-ml-kit/text-recognition` (on-device) |
-| AI analysis | Gemini 2.5 Flash via `@google/generative-ai` |
-| Image processing | `expo-image-manipulator` (crop + upscale before OCR) |
-| Language | TypeScript (strict) |
-| Testing | Jest 30 + jest-expo + React Testing Library |
+---
 
-## Running locally
+## Why it exists
 
-```bash
-# Install dependencies
-npm install
+Ingredient labels are written for regulators, not people. HealthScan's goal is **chemical literacy**: help people understand what is in a product, rather than tell them what to fear.
 
-# Start Metro (Expo Go)
-npx expo start
+That goal drives the design:
 
-# Android emulator (requires Node 22 and Android Studio)
-eval "$(fnm env)" && fnm use 22 && \
-  JAVA_HOME="C:/Program Files/Android/Android Studio/jbr" \
-  npx expo run:android
+- **No red/green traffic lights.** Statuses use a calm research palette (blues, purples, teals), so people learn instead of reacting.
+- **Every chemical name comes with its common name and its purpose**, for example "Sodium Benzoate: preservative".
+- **Progressive disclosure.** Each ingredient card opens in three levels: what it is → how to use it safely → the science and the regulatory context.
 
-# Tests
-npm test
+## How it works
+
+```
+Phone (Expo / React Native, strict TypeScript)
+  Camera ─┬─ barcode → instant product hint
+          └─ photo → crop + upscale → on-device OCR (ML Kit)
+                  → INCI normalisation (Latin/French → English)
+                  → product classifier (food / cosmetic / household)
+                  → ingredient tokens
+                  → Gemini 2.5 Flash: plain-English explanation for each ingredient
+                  → on-device allergen + endocrine-disruptor checks
+                  → results: snapshot, product pulse, ingredient cards
 ```
 
-> **Node version:** the project requires Node 22. If you use fnm, run `fnm use 22` before any Expo CLI command.
+**Privacy:** OCR runs on the phone. Only the extracted ingredient text is sent for analysis, never the photo.
 
-## Environment
+<!-- TODO(M2): replace with the final diagram including the serverless back end and shared contract -->
+
+## Testing the AI
+
+<!-- TODO(M3): golden-set size, latest scores, planted-fault table, link to the full eval report -->
+Coming in milestone 3: a golden set of real labels, automated accuracy and hallucination scoring, and evals that block merges in CI.
+
+## Engineering practices
+
+- **Strict TypeScript** throughout. `npm run typecheck` is a CI gate.
+- **CI on every PR:** ESLint (zero warnings allowed), Prettier, typecheck, Jest, and a full-history secret scan.
+- **275 tests, none skipped.** Core flows such as camera capture → OCR → handoff → navigation are tested against behaviour, and each behaviour was checked by planting a fault and confirming a test fails.
+- Accessibility labels and roles on the primary controls.
+
+## Responsible health information
+
+**HealthScan is for learning. It is not medical advice.** It explains what ingredients are and why they are used. It can't tell you what is safe for you, and AI-generated explanations can be wrong. Always check the label, and ask a pharmacist, doctor or allergist about allergies or health concerns. The app shows this notice on every results screen.
+
+## Run it locally
+
+Requires Node 22. Android builds also need Android Studio.
+
+```bash
+npm install
+npx expo start          # Metro bundler
+npm run android         # build and run on an Android emulator/device
+npm run verify          # lint + format check + typecheck + tests (what CI runs)
+```
 
 Create `.env.local` in the project root:
 
@@ -49,46 +71,30 @@ Create `.env.local` in the project root:
 EXPO_PUBLIC_GEMINI_API_KEY=your_key_here
 ```
 
-## Architecture
+> This key currently ships in the app bundle. Milestone 2 moves it behind a serverless back end so the app never holds it.
 
-```
-Camera (expo-camera)
-  ├── Barcode path  →  real-time scan → ghost pill label
-  └── OCR path
-        ↓
-      Image capture + preprocessing (crop 80×40%, upscale to 1500px)
-        ↓
-      On-device OCR (ML Kit)
-        ↓
-      INCI synonym normalisation (French/Latin → English)
-        ↓
-      Product type classification  (FOOD / COSMETIC / HOUSEHOLD / UNKNOWN)
-        ↓
-      Gemini 2.5 Flash  →  Ingredient[] (11 fields per ingredient)
-        ↓
-      Allergen detection  (Milk, Egg, Wheat alias matching)
-        ↓
-      Results screen
-            ├── DailySnapshot  (weather-tone risk summary)
-            ├── ProductPulse   (allergen count, product type, primary ingredient)
-            └── IngredientCard × N  (three-tier expandable disclosure)
-```
+## Tech stack
 
-## Project structure
+| Layer | Technology |
+|---|---|
+| App | React Native 0.83 + Expo SDK 55, Expo Router |
+| Camera & OCR | `expo-camera`, `@react-native-ml-kit/text-recognition` (on device) |
+| AI | Gemini 2.5 Flash |
+| Language | TypeScript (strict) |
+| Quality | Jest 30 + React Native Testing Library, ESLint, Prettier, gitleaks, GitHub Actions |
 
-```
-app/                  Expo Router screens
-  index.tsx           Camera + viewfinder
-  results.tsx         Ingredient results screen
+## Roadmap
 
-src/
-  services/           Business logic and API wrappers
-  components/         UI components
-  data/               Static reference data (EDC list, GTIN micro-labels)
-  types/              TypeScript interfaces
-  styles/             Theme, palette, motion constants
+| Milestone | Focus | Status |
+|---|---|---|
+| M1 | Public-ready repo: CI gates, real tests, secret scanning, disclaimer | ✅ Done |
+| M2 | Serverless TypeScript back end (Azure Functions) holding the AI key; shared validated contract | Planned |
+| M3 | LLM evals in CI: golden labels, accuracy and hallucination scoring, planted faults | Planned |
+| M4 | Mobile craft: offline cache, permission states, performance on low-end devices, E2E tests | Planned |
+| M5 | Confidence and sources, allergen profile, accessibility audit, telemetry | Planned |
+| M6 | Web demo + Android APK, final README | Planned |
 
-CLAUDE.md             Full developer guide (pipeline, schema, conventions)
-```
+## Developer docs
 
-See `CLAUDE.md` for the complete developer reference including the data schema, services API, component inventory, and dependency hygiene notes.
+- [`CLAUDE.md`](CLAUDE.md): full developer guide (pipeline, schema, conventions)
+- [`docs/HANDOFF.md`](docs/HANDOFF.md): architecture plan and milestone definitions of done
