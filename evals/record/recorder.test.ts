@@ -1,3 +1,4 @@
+import { prepareLabel } from '../../src/services/analysisService';
 import { GOLDEN_CASES } from '../golden/cases';
 import { hashPrompt, parseDotEnv, recordCase, redact } from './recorder';
 
@@ -7,7 +8,7 @@ const fixedClock = () => new Date('2026-11-15T20:00:00Z');
 describe('recordCase', () => {
   it('records the production prompt metadata and the raw reply', async () => {
     let t = 1000;
-    const generate = jest.fn(async () => {
+    const generate = jest.fn(async (_prompt: string) => {
       t += 850;
       return '[{"source_token":"sodium hydroxide 30%"}]';
     });
@@ -25,7 +26,7 @@ describe('recordCase', () => {
       error: null,
       latencyMs: 850,
     });
-    expect(rec.tokens).toContain('water');
+    expect(rec.tokens).toEqual(prepareLabel(golden.labelText).tokens); // exactly what production sends
     const prompt = generate.mock.calls[0][0] as string;
     expect(rec.promptHash).toBe(hashPrompt(prompt));
     expect(prompt).toContain('"source_token"');
