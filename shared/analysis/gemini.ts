@@ -171,6 +171,10 @@ export const createGeminiGenerate = (apiKey: string): GenerateFn => {
   return async prompt => (await model.generateContent(prompt)).response.text();
 };
 
+/** The exact prompt sent for a token list. Shared with the eval recorder so recordings match production. */
+export const buildAnalysisPrompt = (tokens: string[], productType: ProductType): string =>
+  buildPrompt(productType) + '\n' + tokens.join('\n');
+
 export const analyzeTokens = async (
   tokens: string[],
   productType: ProductType,
@@ -179,7 +183,7 @@ export const analyzeTokens = async (
   const base = { promptVersion: PROMPT_VERSION, model: GEMINI_MODEL };
   if (tokens.length === 0) return { ...base, ingredients: [], degraded: false, attempts: 0 };
 
-  const prompt = buildPrompt(productType) + '\n' + tokens.join('\n');
+  const prompt = buildAnalysisPrompt(tokens, productType);
   let lastError: unknown;
   for (let attempt = 1; attempt <= GEMINI_MAX_ATTEMPTS; attempt++) {
     try {

@@ -16,7 +16,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "evals:offline": "jest --testMatch '<rootDir>/evals/**/*.eval.ts'",
-    "server:dev": "tsx server/adapters/node.ts"
+    "server:dev": "tsx server/adapters/node.ts",
+    "evals:record": "tsx evals/record/cli.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

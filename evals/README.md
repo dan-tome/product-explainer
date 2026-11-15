@@ -9,6 +9,19 @@ floors that only move up. Every tier reads the same golden set in [`golden/cases
 | **Replay** | _planned (M3)_ | None | Every PR | Recorded Gemini responses through the post-processing (schema validation, token join, allergen merge) |
 | **Live** | _planned (M3)_ | Gemini | Prompt/schema changes, nightly | Plain-English name accuracy, risk-family recall, safety floor, hallucination rate, latency, cost |
 
+## Recording real Gemini responses
+
+```bash
+npm run evals:record -- --dry-run          # see exactly what would be sent (no key, no network)
+npm run evals:record                       # record all golden cases (about 12 calls, about a minute)
+npm run evals:record -- --only food-crisps # record one case
+```
+
+Uses `GEMINI_API_KEY` or `EXPO_PUBLIC_GEMINI_API_KEY` from the environment or `.env.local`. The key
+is never printed or saved, and error messages are redacted. Each recording in `recordings/` stores the
+raw reply plus the model, prompt version and a hash of the exact prompt, so replay tests can tell
+when a recording is stale. Re-record after any prompt or pipeline change that alters what is sent.
+
 ## Rules
 
 - **Floors are a ratchet.** [`thresholds.json`](thresholds.json) holds the minimum score for each
