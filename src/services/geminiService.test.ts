@@ -11,6 +11,7 @@ import {
   analyzeWithGemini,
   joinByToken,
   parseGeminiResponse,
+  requestAnalysis,
 } from './geminiService';
 
 describe('analyzeWithGemini', () => {
@@ -272,5 +273,87 @@ describe('parseGeminiResponse', () => {
     expect(entries).toHaveLength(1);
     expect(entries[0].common_name).toBeUndefined();
     expect(entries[0].scientific_name).toBe('Glycerin');
+  });
+});
+
+describe('server mode (EXPO_PUBLIC_ANALYSIS_URL)', () => {
+  const URL = 'https://api.example/analyze';
+  const okBody = {
+    contractVersion: 1,
+    ingredients: [
+      {
+        scientific_name: 'Salt',
+        common_name: 'Table salt',
+        functional_purpose: 'Seasoning - Flavour',
+        regulatory_context: 'Permitted.',
+        exposure_context: 'Safe for intended use.',
+        science_note: 'Sodium chloride.',
+        literacy_flag: '',
+        risk_family: null,
+        status: 'safe',
+        is_ai_generated: true,
+      },
+    ],
+    meta: {
+      model: 'gemini-2.5-flash',
+      promptVersion: 'v1',
+      attempts: 1,
+      degraded: false,
+      latencyMs: 900,
+    },
+  };
+  const response = (status: number, body: unknown) =>
+    ({ ok: status >= 200 && status < 300, status, json: async () => body }) as Response;
+
+  let fetchMock: jest.Mock;
+  let warnSpy: jest.SpyInstance;
+  beforeEach(() => {
+    (GoogleGenerativeAI as jest.Mock).mockClear();
+    fetchMock = jest.fn();
+    global.fetch = fetchMock;
+    warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+  });
+  afterEach(() => {
+    delete process.env.EXPO_PUBLIC_ANALYSIS_URL;
+    warnSpy.mockRestore();
+  });
+
+  it('calls the server, not Gemini, when the URL is configured', async () => {
+    process.env.EXPO_PUBLIC_ANALYSIS_URL = URL;
+    fetchMock.mockResolvedValue(response(200, okBody));
+    const result = await analyzeWithGemini(['salt'], 'FOOD');
+    expect(result[0].common_name).toBe('Table salt');
+    expect(GoogleGenerativeAI).not.toHaveBeenCalled();
+    const [calledUrl, init] = fetchMock.mock.calls[0];
+    expect(calledUrl).toBe(URL);
+    expect(JSON.parse(init.body)).toEqual({ tokens: ['salt'], productType: 'FOOD' });
+  });
+
+  it('retries once on a 5xx and uses the second response', async () => {
+    fetchMock.mockResolvedValueOnce(response(503, {})).mockResolvedValueOnce(response(200, okBody));
+    const result = await requestAnalysis(URL, ['salt'], 'FOOD');
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(result[0].common_name).toBe('Table salt');
+  });
+
+  it('does not retry a 4xx; falls back to unexplained tokens', async () => {
+    fetchMock.mockResolvedValue(response(429, { error: { code: 'rate_limited', message: '' } }));
+    const result = await requestAnalysis(URL, ['salt'], 'FOOD');
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(result[0]).toMatchObject({ scientific_name: 'salt', status: 'unknown' });
+    expect(warnSpy).toHaveBeenCalled();
+  });
+
+  it('rejects a response that breaks the contract', async () => {
+    fetchMock.mockResolvedValue(response(200, { ...okBody, contractVersion: 2 }));
+    const result = await requestAnalysis(URL, ['salt'], 'FOOD');
+    expect(result[0].status).toBe('unknown');
+  });
+
+  it('falls back after two network failures', async () => {
+    fetchMock.mockRejectedValue(new TypeError('Network request failed'));
+    const result = await requestAnalysis(URL, ['salt', 'sugar'], 'FOOD');
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(result.map(r => r.scientific_name)).toEqual(['salt', 'sugar']);
   });
 });
