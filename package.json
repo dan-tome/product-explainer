@@ -11,7 +11,10 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "typecheck": "tsc --noEmit",
-    "verify": "npm run typecheck && npm test -- --ci"
+    "verify": "npm run lint && npm run format:check && npm run typecheck && npm test -- --ci",
+    "lint": "eslint . --max-warnings 0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
@@ -39,8 +42,12 @@
     "@types/jest": "^30.0.0",
     "@types/react": "~19.2.10",
     "babel-preset-expo": "^55.0.17",
+    "eslint": "^9.39.5",
+    "eslint-config-expo": "~55.0.1",
+    "eslint-config-prettier": "^10.1.8",
     "jest": "^30.3.0",
     "jest-expo": "^55.0.16",
+    "prettier": "^3.10.1",
     "react-test-renderer": "19.2.5",
     "typescript": "^6.0.3"
   },
