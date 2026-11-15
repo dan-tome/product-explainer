@@ -1,0 +1,12 @@
+# Secret scanning config for CI (gitleaks v8). Extends the default ruleset.
+[extend]
+useDefault = true
+
+[allowlist]
+description = """
+A Gemini API key was committed in .claude/settings.local.json in 50c16cd.
+It was revoked on 2026-11-15 and no longer works; the file is now untracked
+and gitignored. Only that historical commit is allowlisted, so any new
+secret, in any file, still fails CI.
+"""
+commits = ["50c16cda7835eade865e6f84b0cdf54977909287"]
